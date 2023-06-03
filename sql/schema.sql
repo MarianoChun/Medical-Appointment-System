@@ -91,7 +91,7 @@ nombre text,
 contacto_nombre text,
 contacto_apellido text,
 contacto_telefono char(12),
-contacto_email text,
+contacto_email text
 );
 
 create table liquidacion_cabecera(
