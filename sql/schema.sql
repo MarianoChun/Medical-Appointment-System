@@ -7,7 +7,7 @@ create table paciente(
 nro_paciente int, 
 nombre text,
 apellido text,
-dni_paciente int;
+dni_paciente int,
 f_nac date,
 nro_obra_social int,
 nro_afiliade int,
