@@ -14,7 +14,7 @@ nro_afiliade int,
 domicilio text,
 telefono char(12),
 email text
-)
+);
 
 create table medique(
 dni_medique int,
@@ -23,7 +23,7 @@ apellido text,
 especialidad varchar(64),
 monto_consulta_privada decimal(12,2),
 telefono char(12)
-)
+);
 
 create table consultorio(
 nro_consultorio int,
@@ -31,7 +31,7 @@ nombre text,
 domicilio text,
 codigo_postal char(8),
 telefono char(12)
-)
+);
 
 create table agenda(
 dni_medique int,
@@ -40,7 +40,7 @@ nro_consultorio int,
 hora_desde time,
 hora_hasta time,
 duracion_turno interval
-)
+);
 
 create table turno(
 nro_turno int,
@@ -54,7 +54,7 @@ monto_paciente decimal(12,2),
 monto_obra_social decimal(12,2),
 f_reserva timestamp,
 estado char(10)
-)
+);
 
 create table reprogramacion(
 nro_turno int,
@@ -65,7 +65,7 @@ email_paciente text,
 nombre_medique text,
 apellido_medique text,
 estado char(12)
-)
+);
 
 create table error(
 nro_error int,
@@ -76,14 +76,14 @@ nro_paciente int,
 operacion char(12),
 f_error timestamp,
 motivo varchar(64)
-)
+);
 
 create table cobertura(
 dni_medique int,
 nro_obra_social int,
 monto_paciente decimal(12,2),
 monto_obra_social decimal(12,2)
-)
+);
 
 create table obra_social (
 nro_obra_social int,
@@ -92,7 +92,7 @@ contacto_nombre text,
 contacto_apellido text,
 contacto_telefono char(12),
 contacto_email text,
-)
+);
 
 create table liquidacion_cabecera(
 nro_liquidacion int,
@@ -100,7 +100,7 @@ nro_obra_social int,
 desde date,
 hasta date,
 total decimal(15,2)
-)
+);
 
 create table liquidacion_detalle(
 nro_liquidacion int,
@@ -115,7 +115,7 @@ nombre_medique text,
 apellido_medique text,
 especialidad varchar(64),
 monto decimal(12,2)
-)
+);
 
 create table envio_email(
 nro_email int,
@@ -125,4 +125,4 @@ asunto text,
 cuerpo text,
 f_envio timestamp,
 estado char(10)
-)
+);
