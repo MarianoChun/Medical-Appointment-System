@@ -36,7 +36,7 @@ begin
     end_of_month := start_of_month + interval '1 month - 1 day';
 
 
-    select exists(select 1 from turno where fecha < end_of_month and fecha > start_of_month) into any_appointment_in_range;
+    select (fecha, fecha) overlaps (start_of_month, end_of_month) from turno into any_appointment_in_range;
     if any_appointment_in_range then
         return false;
     else
