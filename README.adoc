@@ -6,3 +6,30 @@ Agustín Lautaro Escobar <agustinesco@outlook.es>
 == Problemas encontrados
 
 1. Tuvimos dificultad en visualizar las relaciones entre las tablas, para solucionar esto usamos el DER 
+2. Nos encontramos problemas a la hora de generar data para popular las tablas de la base de datos para lo que recurrimos a la pagina https://www.mockaroo.com[Mockaroo] la cual nos permite generar n cantidad de filas para las tablas
+
+=== Archivos sql
+
+.Creación de la db y los schemas
+[source, sql]
+----
+include::sql/schema.sql[]
+----
+
+.Creación de las primary keys
+[source, sql]
+----
+include::sql/pk.sql[]
+----
+
+.Eliminacion de las primary keys
+[source, sql]
+----
+include::sql/pk.sql[]
+----
+
+.Insersion de Pacientes
+[source, sql]
+----
+include::sql/pk.sql[]
+----
