@@ -19,19 +19,19 @@ include::sql/schema.sql[]
 .Creación de las primary keys
 [source, sql]
 ----
-include::sql/pk.sql[]
+include::sql/create.sql[]
 ----
 
 .Eliminacion de las primary keys
 [source, sql]
 ----
-include::sql/remove_pk.sql[]
+include::sql/remove.sql[]
 ----
 
 .Insersion de Pacientes
 [source, sql]
 ----
-include::sql/paciente.sql[]
+include::sql/4-paciente.sql[]
 ----
 
 == Conclusiones
