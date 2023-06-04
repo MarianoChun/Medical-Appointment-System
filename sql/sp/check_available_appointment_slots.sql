@@ -1,19 +1,53 @@
-create function generate_available_slots_in_day(medic_document_number int, day int) returns void as $$
+create or replace function generate_available_slots_in_day(medic_document_number int, fecha date) returns void as $$
 declare
- tiempo agenda.hora_desde%type;
- start_time agenda.hora_desde%type;
- end_time agenda.hora_hasta%type;
- duration agenda.duracion_turno%type;
+    agenda record;
+    tiempo agenda.hora_desde%type;
+    appointment_number int; 
+    appointment_datetime timestamp;
+    dow int; 
 begin
-    select hora_desde into start_time from agenda as a where a.dni_medique = medic_document_number and a.dia = day;
-    select duracion_turno into duration from agenda as a where a.dni_medique = medic_document_number and a.dia = day;
-    select hora_hasta into end_time from agenda as a where a.dni_medique = medic_document_number and a.dia = day;
 
-    tiempo := start_time;
+    dow := date_part('dow', fecha);
+    select * into agenda from agenda where dni_medique = medic_document_number and dia = dow;
 
-    while tiempo < end_time  loop
-        raise notice 'Turno disponible a las %', tiempo;
-        tiempo := tiempo + duration;
+
+    tiempo := agenda.hora_desde;
+
+    while tiempo < agenda.hora_hasta  loop
+        select count(*) into appointment_number from turno;
+        appointment_datetime := fecha + tiempo;
+        insert into turno (nro_turno, fecha, nro_consultorio, dni_medique, estado)
+        values (appointment_number + 1, appointment_datetime, agenda.nro_consultorio, medic_document_number, 'disponible');
+        tiempo := tiempo + agenda.duracion_turno;
     end loop;
+end;
+$$ language plpgsql;
+
+
+create or replace function generate_appointments_in_month(year int, month int) returns boolean as $$
+declare
+    start_of_month timestamp;
+    end_of_month timestamp;
+    d date;
+    m record;
+    any_appointment_in_range boolean;
+begin
+    start_of_month := make_timestamp(year, month, 1, 0, 0, 0);
+    end_of_month := start_of_month + interval '1 month - 1 day';
+
+
+    select exists(select 1 from turno where fecha < end_of_month and fecha > start_of_month) into any_appointment_in_range;
+    if any_appointment_in_range then
+        return false;
+    else
+        for d in select generate_series(start_of_month, end_of_month, interval '1 day') loop
+            for m in select * from medique loop
+                perform generate_available_slots_in_day(m.dni_medique, d);
+            end loop;
+        end loop;
+
+        return true;
+    end if;
+    
 end;
 $$ language plpgsql;
