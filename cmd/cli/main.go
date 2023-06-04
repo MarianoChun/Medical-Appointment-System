@@ -129,7 +129,7 @@ func executeUseCases(optionSelected string,
 
 func scanOptionSelected() (string, error) {
 	var optionSelected string
-	_, err := fmt.Scanf(inputMessage, &optionSelected)
+	_, err := fmt.Scanln(inputMessage, &optionSelected)
 
 	if err != nil {
 		fmt.Println(errorInputMessage)
