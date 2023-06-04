@@ -7,11 +7,11 @@ insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (45621398, 1, 52150.02, 93644.91);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (33964752, 5, 35126.41, 63643.75);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (26387951, 4, 21734.21, 33293.65);
-insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (31659274, 6, 31110.06, 39263.85);
+insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (31659274, 2, 31110.06, 39263.85);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (36725198, 2, 84322.42, 87006.57);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (42891753, 4, 65594.66, 61862.61);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (27536914, 5, 83912.46, 69885.92);
-insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (35198472, 6, 33872.46, 43888.66);
+insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (35198472, 4, 33872.46, 43888.66);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (43961825, 1, 54695.1, 87017.68);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (30874512, 2, 52565.89, 26753.06);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (28319476, 3, 59673.19, 80314.05);
@@ -19,6 +19,6 @@ insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_
 
 -- medics with multiples coverage
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (40271684, 4, 74805.3, 72455.77);
-insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (40271684, 8, 97854.33, 95381.25);
+insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (40271684, 1, 97854.33, 95381.25);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (25648973, 4, 17558.8, 45408.05);
-insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (25648973, 12, 36947.6, 16390.02);
+insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (25648973, 5, 36947.6, 16390.02);
