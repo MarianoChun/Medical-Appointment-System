@@ -1,0 +1,12 @@
+alter table paciente remove constraint paciente_pk primary key (nro_paciente);
+alter table medique remove constraint medique_pk primary key (dni_medique);
+alter table consultorio remove constraint consultorio_pk primary key (nro_consultorio);
+alter table agenda remove constraint agenda_pk primary key (dni_medique, dia);
+alter table turno remove constraint turno_pk primary key (nro_turno);
+alter table reprogramacion remove constraint reprogramacion_pk primary key (nro_turno);
+alter table error remove constraint error_pk primary key (nro_error);
+alter table cobertura remove constraint cobertura_pk primary key (dni_medique, nro_obra_social);
+alter table obra_social remove constraint obra_social_pk primary key (nro_obra_social);
+alter table liquidacion_cabecera remove constraint liquidacion_cabecera_pk primary key (nro_liquidacion);
+alter table liquidacion_detalle remove constraint liquidacion_detalle_pk primary key (nro_liquidacion, nro_linea);
+alter table envio_email remove constraint envio_email_pk primary key (nro_email);
