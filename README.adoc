@@ -1,3 +1,8 @@
 = Bases de Datos: Trabajo Práctico
+Agustín Lautaro Escobar <agustinesco@outlook.es>
 
-test
+
+
+== Problemas encontrados
+
+1. Tuvimos dificultad en visualizar las relaciones entre las tablas, para solucionar esto usamos el DER 
