@@ -1,8 +1,3 @@
-drop database if exists consultorio;
-create database consultorio;
-
-\c consultorio
-
 create table if not exists paciente(
     nro_paciente int, 
     nombre text,
