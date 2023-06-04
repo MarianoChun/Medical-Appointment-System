@@ -50,11 +50,12 @@ func (s DatabaseInitializer) Execute() {
 	//	return
 	//}
 
-	err = kit.ExecuteScripts(triggersProceduresFolderPath, s.db.App())
-	if err != nil {
-		log.Fatalln(errorOccurredMessage, err)
-		return
-	}
+	//TODO: Check Triggers initializing
+	//err = kit.ExecuteScripts(triggersProceduresFolderPath, s.db.App())
+	//if err != nil {
+	//	log.Fatalln(errorOccurredMessage, err)
+	//	return
+	//}
 
 	err = kit.ExecuteScripts(dataFolderPath, s.db.App())
 	if err != nil {
