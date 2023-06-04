@@ -1,15 +1,15 @@
 package pk
 
 import (
-	"database/sql"
 	"fmt"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 type PrimaryKeysDeleter struct {
-	db *sql.DB
+	db kit.Database
 }
 
-func NewPrimaryKeysDeleter(db *sql.DB) PrimaryKeysDeleter {
+func NewPrimaryKeysDeleter(db kit.Database) PrimaryKeysDeleter {
 	return PrimaryKeysDeleter{
 		db: db,
 	}

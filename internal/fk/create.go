@@ -1,15 +1,15 @@
 package fk
 
 import (
-	"database/sql"
 	"fmt"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 type ForeignKeysCreator struct {
-	db *sql.DB
+	db kit.Database
 }
 
-func NewForeignKeysCreator(db *sql.DB) ForeignKeysCreator {
+func NewForeignKeysCreator(db kit.Database) ForeignKeysCreator {
 	return ForeignKeysCreator{
 		db: db,
 	}

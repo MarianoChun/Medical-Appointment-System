@@ -1,20 +1,17 @@
 package sync
 
 import (
-	"database/sql"
 	"fmt"
-	"github.com/boltdb/bolt"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 type DatabasesSynchronizer struct {
-	postgres *sql.DB
-	bolt     *bolt.DB
+	db kit.Database
 }
 
-func NewDatabasesSynchronizer(postgres *sql.DB, bolt *bolt.DB) DatabasesSynchronizer {
+func NewDatabasesSynchronizer(db kit.Database) DatabasesSynchronizer {
 	return DatabasesSynchronizer{
-		postgres: postgres,
-		bolt:     bolt,
+		db: db,
 	}
 }
 

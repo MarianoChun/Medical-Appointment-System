@@ -1,15 +1,15 @@
 package pk
 
 import (
-	"database/sql"
 	"fmt"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 type PrimaryKeysCreator struct {
-	db *sql.DB
+	db kit.Database
 }
 
-func NewPrimaryKeysCreator(db *sql.DB) PrimaryKeysCreator {
+func NewPrimaryKeysCreator(db kit.Database) PrimaryKeysCreator {
 	return PrimaryKeysCreator{
 		db: db,
 	}

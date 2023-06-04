@@ -1,5 +1,6 @@
-create table if not exists paciente(
-    nro_paciente int, 
+drop table if exists paciente;
+create table paciente(
+    nro_paciente int,
     nombre text,
     apellido text,
     dni_paciente int,
@@ -11,7 +12,8 @@ create table if not exists paciente(
     email text
 );
 
-create table if not exists medique(
+drop table if exists medique;
+create table medique(
     dni_medique int,
     nombre text,
     apellido text,
@@ -20,7 +22,8 @@ create table if not exists medique(
     telefono char(12)
 );
 
-create table if not exists consultorio(
+drop table if exists consultorio;
+create table consultorio(
     nro_consultorio int,
     nombre text,
     domicilio text,
@@ -28,7 +31,8 @@ create table if not exists consultorio(
     telefono char(12)
 );
 
-create table if not exists agenda(
+drop table if exists agenda;
+create table agenda(
     dni_medique int,
     dia int,
     nro_consultorio int,
@@ -37,7 +41,8 @@ create table if not exists agenda(
     duracion_turno interval
 );
 
-create table if not exists turno(
+drop table if exists turno;
+create table turno(
     nro_turno int,
     fecha timestamp,
     nro_consultorio int,
@@ -51,7 +56,8 @@ create table if not exists turno(
     estado char(10)
 );
 
-create table if not exists reprogramacion(
+drop table if exists reprogramacion;
+create table reprogramacion(
     nro_turno int,
     nombre_paciente text,
     apellido_paciente text,
@@ -62,7 +68,8 @@ create table if not exists reprogramacion(
     estado char(12)
 );
 
-create table if not exists error(
+drop table if exists error;
+create table error(
     nro_error int,
     f_turno timestamp,
     nro_consultorio int,
@@ -73,14 +80,16 @@ create table if not exists error(
     motivo varchar(64)
 );
 
-create table if not exists cobertura(
+drop table if exists cobertura;
+create table cobertura(
     dni_medique int,
     nro_obra_social int,
     monto_paciente decimal(12,2),
     monto_obra_social decimal(12,2)
 );
 
-create table if not exists obra_social (
+drop table if exists obra_social;
+create table obra_social (
     nro_obra_social int,
     nombre text,
     contacto_nombre text,
@@ -89,7 +98,8 @@ create table if not exists obra_social (
     contacto_email text
 );
 
-create table if not exists liquidacion_cabecera(
+drop table if exists liquidacion_cabecera;
+create table liquidacion_cabecera(
     nro_liquidacion int,
     nro_obra_social int,
     desde date,
@@ -97,7 +107,8 @@ create table if not exists liquidacion_cabecera(
     total decimal(15,2)
 );
 
-create table if not exists liquidacion_detalle(
+drop table if exists liquidacion_detalle;
+create table liquidacion_detalle(
     nro_liquidacion int,
     nro_linea int,
     f_atencion date,
@@ -112,7 +123,8 @@ create table if not exists liquidacion_detalle(
     monto decimal(12,2)
 );
 
-create table if not exists envio_email(
+drop table if exists envio_email;
+create table envio_email(
     nro_email int,
     f_generacion timestamp,
     email_paciente text,

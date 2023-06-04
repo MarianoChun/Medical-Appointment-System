@@ -1,25 +1,19 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-	"github.com/boltdb/bolt"
 	_ "github.com/lib/pq"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/fk"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/instance"
 	_ "gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/instance"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/pk"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sync"
-	"log"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
+	"time"
 )
 
 const (
-	sqlDriverName     = "postgres"
-	sqlDataSourceName = "user=postgres host=localhost dbname=consultorios sslmode=disable"
-
-	boltPath = "consultorios.db"
-	boltMode = 0600
-
+	welcomeMessage    = "  ____                      _ _             _           \n / ___|___  _ __  ___ _   _| | |_ ___  _ __(_) ___  ___ \n| |   / _ \\| '_ \\/ __| | | | | __/ _ \\| '__| |/ _ \\/ __|\n| |__| (_) | | | \\__ \\ |_| | | || (_) | |  | | (_) \\__ \\\n \\____\\___/|_| |_|___/\\__,_|_|\\__\\___/|_|  |_|\\___/|___/\n                                                        \n    _    ____  __  __ ___ _   _ \n   / \\  |  _ \\|  \\/  |_ _| \\ | |\n  / _ \\ | | | | |\\/| || ||  \\| |\n / ___ \\| |_| | |  | || || |\\  |\n/_/   \\_\\____/|_|  |_|___|_| \\_|\n                                \n"
 	firstOption       = "1. Instanciar Base de datos"
 	secondOption      = "2. Crear PK's"
 	thirtyOption      = "3. Eliminar PK's"
@@ -33,26 +27,29 @@ const (
 )
 
 func main() {
-	postgresConnection := createPostgresDatabaseConnection()
-	boltConnection := createBoltDatabaseConnection()
+	database, err := kit.NewDatabase()
+	if err != nil {
+		return
+	}
 
-	databaseInstantiator := instance.NewDatabaseInstantiator(postgresConnection)
-	primaryKeysCreator := pk.NewPrimaryKeysCreator(postgresConnection)
-	primaryKeysDeleter := pk.NewPrimaryKeysDeleter(postgresConnection)
-	foreignKeysCreator := fk.NewForeignKeysCreator(postgresConnection)
-	foreignKeysDeleter := fk.NewForeignKeysDeleter(postgresConnection)
-	databasesSynchronizer := sync.NewDatabasesSynchronizer(postgresConnection, boltConnection)
+	initializer := instance.NewDatabaseInitializer(database)
+	primaryKeysCreator := pk.NewPrimaryKeysCreator(database)
+	primaryKeysDeleter := pk.NewPrimaryKeysDeleter(database)
+	foreignKeysCreator := fk.NewForeignKeysCreator(database)
+	foreignKeysDeleter := fk.NewForeignKeysDeleter(database)
+	databasesSynchronizer := sync.NewDatabasesSynchronizer(database)
 
 	for {
 		printOptions()
 
 		optionSelected, err := scanOptionSelected()
 		if err != nil {
+			database.Close()
 			break
 		}
 
 		continueExecution := executeUseCases(optionSelected,
-			databaseInstantiator,
+			initializer,
 			primaryKeysCreator,
 			primaryKeysDeleter,
 			foreignKeysCreator,
@@ -60,32 +57,15 @@ func main() {
 			databasesSynchronizer)
 
 		if !continueExecution {
+			database.Close()
 			break
 		}
 	}
 }
 
-func createBoltDatabaseConnection() *bolt.DB {
-	db, err := bolt.Open(boltPath, boltMode, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	return db
-}
-
-func createPostgresDatabaseConnection() *sql.DB {
-	db, err := sql.Open(sqlDriverName, sqlDataSourceName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	return db
-}
-
 func printOptions() {
+	fmt.Println(welcomeMessage)
+	time.Sleep(1 * time.Second)
 	fmt.Println(firstOption)
 	fmt.Println(secondOption)
 	fmt.Println(thirtyOption)
@@ -97,7 +77,7 @@ func printOptions() {
 }
 
 func executeUseCases(optionSelected string,
-	databaseInstantiator instance.DatabaseInstantiator,
+	initializer instance.DatabaseInitializer,
 	primaryKeysCreator pk.PrimaryKeysCreator,
 	primaryKeysDeleter pk.PrimaryKeysDeleter,
 	foreignKeysCreator fk.ForeignKeysCreator,
@@ -105,7 +85,7 @@ func executeUseCases(optionSelected string,
 	databasesSynchronizer sync.DatabasesSynchronizer) bool {
 	switch optionSelected {
 	case "1":
-		databaseInstantiator.Execute()
+		initializer.Execute()
 		return true
 	case "2":
 		primaryKeysCreator.Execute()
@@ -129,7 +109,7 @@ func executeUseCases(optionSelected string,
 
 func scanOptionSelected() (string, error) {
 	var optionSelected string
-	_, err := fmt.Scanln(inputMessage, &optionSelected)
+	_, err := fmt.Scanf(inputMessage, &optionSelected)
 
 	if err != nil {
 		fmt.Println(errorInputMessage)

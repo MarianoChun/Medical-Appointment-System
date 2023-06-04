@@ -1,8 +1,10 @@
 package kit
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 func ReadFile(path string) (string, error) {
@@ -22,11 +24,11 @@ func GetFilesPathByFolder(path string) ([]string, error) {
 		return nil, err
 	}
 
-	var filesPath []string = make([]string, len(files))
+	var filesPath []string = make([]string, 0)
 
 	for i := 0; i < len(files); i++ {
-		if !files[i].IsDir() {
-			filesPath = append(filesPath, files[i].Name())
+		if !files[i].IsDir() && !strings.EqualFold(files[i].Name(), "") {
+			filesPath = append(filesPath, fmt.Sprintf("%s/%s", path, files[i].Name()))
 		}
 	}
 

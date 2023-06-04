@@ -1,15 +1,15 @@
 package fk
 
 import (
-	"database/sql"
 	"fmt"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 type ForeignKeysDeleter struct {
-	db *sql.DB
+	db kit.Database
 }
 
-func NewForeignKeysDeleter(db *sql.DB) ForeignKeysDeleter {
+func NewForeignKeysDeleter(db kit.Database) ForeignKeysDeleter {
 	return ForeignKeysDeleter{
 		db: db,
 	}
