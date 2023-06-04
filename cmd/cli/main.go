@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	_ "github.com/lib/pq"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/fk"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/instance"
@@ -9,7 +11,6 @@ import (
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/pk"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sync"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
-	"time"
 )
 
 const (
@@ -23,7 +24,6 @@ const (
 	exitOption        = "Para salir presione cualquier tecla"
 	errorInputMessage = "Ocurrió un error, intente nuevamente"
 	optionMessage     = "Ingrese una opcion:"
-	inputMessage      = "%s"
 )
 
 func main() {
@@ -109,7 +109,7 @@ func executeUseCases(optionSelected string,
 
 func scanOptionSelected() (string, error) {
 	var optionSelected string
-	_, err := fmt.Scanf(inputMessage, &optionSelected)
+	_, err := fmt.Scanln(&optionSelected)
 
 	if err != nil {
 		fmt.Println(errorInputMessage)
