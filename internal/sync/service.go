@@ -1,13 +1,23 @@
 package sync
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+	"github.com/boltdb/bolt"
+)
 
-type DatabasesSynchronizerService struct{}
-
-func NewDatabasesSynchronizer() DatabasesSynchronizerService {
-	return DatabasesSynchronizerService{}
+type DatabasesSynchronizer struct {
+	postgres *sql.DB
+	bolt     *bolt.DB
 }
 
-func (s DatabasesSynchronizerService) Execute() {
+func NewDatabasesSynchronizer(postgres *sql.DB, bolt *bolt.DB) DatabasesSynchronizer {
+	return DatabasesSynchronizer{
+		postgres: postgres,
+		bolt:     bolt,
+	}
+}
+
+func (s DatabasesSynchronizer) Execute() {
 	fmt.Println("Sync Database")
 }

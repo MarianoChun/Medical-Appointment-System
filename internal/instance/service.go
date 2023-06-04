@@ -1,13 +1,20 @@
 package instance
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+)
 
-type DatabaseInstantiatorService struct{}
-
-func NewDatabaseInstantiator() DatabaseInstantiatorService {
-	return DatabaseInstantiatorService{}
+type DatabaseInstantiator struct {
+	db *sql.DB
 }
 
-func (s DatabaseInstantiatorService) Execute() {
+func NewDatabaseInstantiator(db *sql.DB) DatabaseInstantiator {
+	return DatabaseInstantiator{
+		db: db,
+	}
+}
+
+func (s DatabaseInstantiator) Execute() {
 	fmt.Println("Instantiating Database")
 }

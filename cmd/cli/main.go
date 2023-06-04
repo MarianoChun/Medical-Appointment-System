@@ -1,15 +1,25 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"github.com/boltdb/bolt"
+	_ "github.com/lib/pq"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/fk"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/instance"
 	_ "gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/instance"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/pk"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sync"
+	"log"
 )
 
 const (
+	sqlDriverName     = "postgres"
+	sqlDataSourceName = "user=postgres host=localhost dbname=consultorios sslmode=disable"
+
+	boltPath = "consultorios.db"
+	boltMode = 0600
+
 	firstOption       = "1. Instanciar Base de datos"
 	secondOption      = "2. Crear PK's"
 	thirtyOption      = "3. Eliminar PK's"
@@ -23,10 +33,15 @@ const (
 )
 
 func main() {
-	databaseInstantiator := instance.NewDatabaseInstantiator()
-	primaryKeysService := pk.NewPrimaryKeysService()
-	foreignKeysService := fk.NewForeignKeysService()
-	databasesSynchronizer := sync.NewDatabasesSynchronizer()
+	postgresConnection := createPostgresDatabaseConnection()
+	boltConnection := createBoltDatabaseConnection()
+
+	databaseInstantiator := instance.NewDatabaseInstantiator(postgresConnection)
+	primaryKeysCreator := pk.NewPrimaryKeysCreator(postgresConnection)
+	primaryKeysDeleter := pk.NewPrimaryKeysDeleter(postgresConnection)
+	foreignKeysCreator := fk.NewForeignKeysCreator(postgresConnection)
+	foreignKeysDeleter := fk.NewForeignKeysDeleter(postgresConnection)
+	databasesSynchronizer := sync.NewDatabasesSynchronizer(postgresConnection, boltConnection)
 
 	for {
 		printOptions()
@@ -36,12 +51,38 @@ func main() {
 			break
 		}
 
-		continueExecution := executeUseCases(optionSelected, databaseInstantiator, primaryKeysService, foreignKeysService, databasesSynchronizer)
+		continueExecution := executeUseCases(optionSelected,
+			databaseInstantiator,
+			primaryKeysCreator,
+			primaryKeysDeleter,
+			foreignKeysCreator,
+			foreignKeysDeleter,
+			databasesSynchronizer)
 
 		if !continueExecution {
 			break
 		}
 	}
+}
+
+func createBoltDatabaseConnection() *bolt.DB {
+	db, err := bolt.Open(boltPath, boltMode, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	return db
+}
+
+func createPostgresDatabaseConnection() *sql.DB {
+	db, err := sql.Open(sqlDriverName, sqlDataSourceName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	return db
 }
 
 func printOptions() {
@@ -55,25 +96,31 @@ func printOptions() {
 	fmt.Println(optionMessage)
 }
 
-func executeUseCases(optionSelected string, instantiator instance.DatabaseInstantiatorService, primaryKeysService pk.PrimaryKeysService, foreignKeysService fk.ForeignKeysService, synchronizer sync.DatabasesSynchronizerService) bool {
+func executeUseCases(optionSelected string,
+	databaseInstantiator instance.DatabaseInstantiator,
+	primaryKeysCreator pk.PrimaryKeysCreator,
+	primaryKeysDeleter pk.PrimaryKeysDeleter,
+	foreignKeysCreator fk.ForeignKeysCreator,
+	foreignKeysDeleter fk.ForeignKeysDeleter,
+	databasesSynchronizer sync.DatabasesSynchronizer) bool {
 	switch optionSelected {
 	case "1":
-		instantiator.Execute()
+		databaseInstantiator.Execute()
 		return true
 	case "2":
-		primaryKeysService.Create()
+		primaryKeysCreator.Execute()
 		return true
 	case "3":
-		primaryKeysService.Delete()
+		primaryKeysDeleter.Execute()
 		return true
 	case "4":
-		foreignKeysService.Create()
+		foreignKeysCreator.Execute()
 		return true
 	case "5":
-		foreignKeysService.Delete()
+		foreignKeysDeleter.Execute()
 		return true
 	case "6":
-		synchronizer.Execute()
+		databasesSynchronizer.Execute()
 		return true
 	default:
 		return false
