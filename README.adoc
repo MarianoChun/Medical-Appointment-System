@@ -25,13 +25,13 @@ include::sql/pk.sql[]
 .Eliminacion de las primary keys
 [source, sql]
 ----
-include::sql/pk.sql[]
+include::sql/remove_pk.sql[]
 ----
 
 .Insersion de Pacientes
 [source, sql]
 ----
-include::sql/pk.sql[]
+include::sql/paciente.sql[]
 ----
 
 == Conclusiones
