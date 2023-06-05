@@ -45,7 +45,4 @@ begin
 end;
 $$ language plpgsql;
 
-create trigger send_email_on_appointment_canceled
-after update on turno
-for each row
-execute procedure send_email_on_appointment_canceled();
+create trigger send_email_on_appointment_canceled after update on turno for each row execute procedure send_email_on_appointment_canceled();

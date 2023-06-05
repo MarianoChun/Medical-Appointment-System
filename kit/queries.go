@@ -11,6 +11,31 @@ const (
 	executingScriptMessage  = "Executing %s script\n"
 )
 
+func ExecuteFunctionsCreation(folderPath string, db *sql.DB) error {
+	log.Printf(executingScriptsMessage, folderPath)
+
+	files, err := GetFilesPathByFolder(folderPath)
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(files); i++ {
+		file := files[i]
+
+		query, err := ReadFile(file)
+		if err != nil {
+			return err
+		}
+
+		err = ExecuteQuery(query, db)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func ExecuteScripts(folderPath string, db *sql.DB) error {
 	log.Printf(executingScriptsMessage, folderPath)
 
