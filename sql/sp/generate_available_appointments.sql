@@ -42,7 +42,12 @@ begin
     tiempo := agenda.hora_desde;
 
     while tiempo < agenda.hora_hasta  loop
-        select count(*) into appointment_number from turno;
+        select max(nro_turno) into appointment_number from turno;
+
+        if appointment_number is null then
+            appointment_number = 0;
+        end if;
+
         appointment_datetime := fecha + tiempo;
         insert into turno (nro_turno, fecha, nro_consultorio, dni_medique, estado)
         values (appointment_number + 1, appointment_datetime, agenda.nro_consultorio, medic_document_number, 'disponible');

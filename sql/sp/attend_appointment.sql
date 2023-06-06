@@ -28,7 +28,12 @@ create or replace function create_attend_appointment_error(msg text, appointment
 declare
  errorNumber int;
 begin
-    select count(*) into errorNumber from error;
+    select max(nro_error) into errorNumber from error;
+
+    if nro_error is null then
+        errorNumber = 0;
+    end if;
+
     if appointment.nro_turno is null then
         insert into error(nro_error, operacion, f_error, motivo) 
         values (errorNumber + 1, 'atención', now(), msg);
