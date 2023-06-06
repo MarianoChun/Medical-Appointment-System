@@ -1,28 +1,21 @@
 package app
 
 import (
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/db"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/fk"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/instance"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/pk"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sp/appointment"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sp/insurance"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sync"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 type App struct {
-	Database                     kit.Database
-	Initializer                  instance.DatabaseInitializer
-	PrimaryKeysCreator           pk.Creator
-	PrimaryKeysDeleter           pk.Deleter
-	ForeignKeysCreator           fk.Creator
-	ForeignKeysDeleter           fk.Deleter
-	DatabasesSynchronizer        sync.DatabasesSynchronizer
-	AppointmentAttender          appointment.Attender
-	AppointmentReserver          appointment.Reserver
-	AppointmentCanceller         appointment.Canceller
-	AppointmentGenerator         appointment.DateGenerator
-	InsuranceSettlementGenerator insurance.SettlementGenerator
+	database           kit.Database
+	DatabaseService    db.Service
+	PrimaryKeysService pk.Service
+	ForeignKeysService fk.Service
+	Appointment        appointment.Service
+	InsuranceService   insurance.Service
 }
 
 func NewApp() (App, error) {
@@ -32,17 +25,15 @@ func NewApp() (App, error) {
 	}
 
 	return App{
-		Database:                     database,
-		Initializer:                  instance.NewDatabaseInitializer(database),
-		PrimaryKeysCreator:           pk.NewPrimaryKeysCreator(database),
-		PrimaryKeysDeleter:           pk.NewPrimaryKeysDeleter(database),
-		ForeignKeysCreator:           fk.NewForeignKeysCreator(database),
-		ForeignKeysDeleter:           fk.NewForeignKeysDeleter(database),
-		DatabasesSynchronizer:        sync.NewDatabasesSynchronizer(database),
-		AppointmentAttender:          appointment.NewAttender(database),
-		AppointmentReserver:          appointment.NewReserver(database),
-		AppointmentCanceller:         appointment.NewCanceller(database),
-		AppointmentGenerator:         appointment.NewGenerator(database),
-		InsuranceSettlementGenerator: insurance.NewSettlementGenerator(database),
+		database:           database,
+		DatabaseService:    db.NewService(database),
+		PrimaryKeysService: pk.NewService(database),
+		ForeignKeysService: fk.NewService(database),
+		Appointment:        appointment.NewService(database),
+		InsuranceService:   insurance.NewService(database),
 	}, nil
+}
+
+func (s App) Close() {
+	s.database.Close()
 }

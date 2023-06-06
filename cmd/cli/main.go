@@ -41,14 +41,14 @@ func executeMainOptions(app app.App) {
 
 		optionSelected, err := kit.ScanOptionSelected()
 		if err != nil {
-			app.Database.Close()
+			app.Close()
 			break
 		}
 
 		continueExecution := executeUseCases(optionSelected, app)
 
 		if !continueExecution {
-			app.Database.Close()
+			app.Close()
 			break
 		}
 	}
@@ -57,22 +57,22 @@ func executeMainOptions(app app.App) {
 func executeUseCases(optionSelected string, app app.App) bool {
 	switch optionSelected {
 	case "1":
-		app.Initializer.Execute()
+		app.DatabaseService.Init()
 		return true
 	case "2":
-		app.PrimaryKeysCreator.Execute()
+		app.PrimaryKeysService.Create()
 		return true
 	case "3":
-		app.PrimaryKeysDeleter.Execute()
+		app.PrimaryKeysService.Delete()
 		return true
 	case "4":
-		app.ForeignKeysCreator.Execute()
+		app.ForeignKeysService.Create()
 		return true
 	case "5":
-		app.ForeignKeysDeleter.Execute()
+		app.PrimaryKeysService.Delete()
 		return true
 	case "6":
-		app.DatabasesSynchronizer.Execute()
+		app.DatabaseService.SyncBetweenSQLAndNoSQL()
 		return true
 	case "7":
 		showStoredProcedures(app)
@@ -126,7 +126,7 @@ func executeAppointmentGenerator(app app.App) {
 		return
 	}
 
-	app.AppointmentGenerator.Execute(date.Year(), date.Month())
+	app.Appointment.Generate(date.Year(), date.Month())
 }
 
 func executeAppointmentAttender(app app.App) {
@@ -142,11 +142,11 @@ func executeAppointmentAttender(app app.App) {
 		return
 	}
 
-	app.AppointmentAttender.Execute(appointmentNumber)
+	app.Appointment.Attend(appointmentNumber)
 }
 
 func executeInsuranceSettlementGenerator(app app.App) {
-	app.InsuranceSettlementGenerator.Execute()
+	app.InsuranceService.GenerateSettlements()
 }
 
 func executeAppointmentReserver(app app.App) {
@@ -180,7 +180,7 @@ func executeAppointmentReserver(app app.App) {
 		return
 	}
 
-	app.AppointmentReserver.Execute(clinicHistoryNumber, dni, date)
+	app.Appointment.Reserve(clinicHistoryNumber, dni, date)
 }
 
 func executeAppointmentCanceller(app app.App) {
@@ -210,5 +210,5 @@ func executeAppointmentCanceller(app app.App) {
 		return
 	}
 
-	app.AppointmentCanceller.Execute(dni, dateFrom, dateTo)
+	app.Appointment.Cancel(dni, dateFrom, dateTo)
 }

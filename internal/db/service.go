@@ -1,4 +1,4 @@
-package instance
+package db
 
 import (
 	_ "database/sql"
@@ -20,17 +20,20 @@ const (
 	errorOccurredMessage = "Error occurred"
 )
 
-type DatabaseInitializer struct {
+type Service struct {
 	db kit.Database
 }
 
-func NewDatabaseInitializer(db kit.Database) DatabaseInitializer {
-	return DatabaseInitializer{
+func NewService(db kit.Database) Service {
+	return Service{
 		db: db,
 	}
 }
 
-func (s DatabaseInitializer) Execute() {
+func (s Service) SyncBetweenSQLAndNoSQL() {
+}
+
+func (s Service) Init() {
 	log.Println(initLogMessage)
 
 	err := kit.ExecuteScript(databaseScriptPath, s.db.Postgres())

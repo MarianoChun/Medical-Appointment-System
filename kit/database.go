@@ -18,7 +18,7 @@ const (
 	sqlSslMode        = "disable"
 	sqlDataSourceName = "user=%s password=%s host=%s dbname=%s sslmode=%s"
 
-	boltPath = "consultorio.db"
+	boltPath = "nosql/consultorio.db"
 	boltMode = 0600
 )
 
@@ -32,20 +32,20 @@ func NewDatabase() (Database, error) {
 	postgresDataSource := fmt.Sprintf(sqlDataSourceName, sqlUser, sqlPass, sqlHost, sqlPostgresDb, sqlSslMode)
 	postgresConnection, err := sql.Open(sqlDriverName, postgresDataSource)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("can not connect with database %s", postgresDataSource), err)
+		log.Fatal(fmt.Sprintf("can not connect with db %s", postgresDataSource), err)
 		return Database{}, err
 	}
 
 	appDataSource := fmt.Sprintf(sqlDataSourceName, sqlUser, sqlPass, sqlHost, sqlApplicationDb, sqlSslMode)
 	appConnection, err := sql.Open(sqlDriverName, appDataSource)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("can not connect with database %s", appDataSource), err)
+		log.Fatal(fmt.Sprintf("can not connect with db %s", appDataSource), err)
 		return Database{}, err
 	}
 
 	boltConnection, err := bolt.Open(boltPath, boltMode, nil)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("can not connect with database %s", boltConnection), err)
+		log.Fatal(fmt.Sprintf("can not connect with db %s", boltConnection), err)
 		return Database{}, err
 	}
 

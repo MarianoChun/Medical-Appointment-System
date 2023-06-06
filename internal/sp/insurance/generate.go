@@ -2,16 +2,16 @@ package insurance
 
 import "gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 
-type SettlementGenerator struct {
+type Service struct {
 	db kit.Database
 }
 
-func NewSettlementGenerator(db kit.Database) SettlementGenerator {
-	return SettlementGenerator{
+func NewService(db kit.Database) Service {
+	return Service{
 		db: db,
 	}
 }
 
-func (s SettlementGenerator) Execute() {
+func (s Service) GenerateSettlements() {
 
 }
