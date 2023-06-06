@@ -21,6 +21,7 @@ const (
 	quarterOption     = "4. Crear FK's"
 	fifthOption       = "5. Eliminar FK's"
 	sixthOption       = "6. Sincronizar NoSQL con SQL"
+	seventhOption     = "7. Ejecutar Stored Procedures"
 	exitOption        = "Para salir presione cualquier tecla"
 	errorInputMessage = "Ocurrió un error, intente nuevamente"
 	optionMessage     = "Ingrese una opcion:"
@@ -54,7 +55,8 @@ func main() {
 			primaryKeysDeleter,
 			foreignKeysCreator,
 			foreignKeysDeleter,
-			databasesSynchronizer)
+			databasesSynchronizer,
+			database)
 
 		if !continueExecution {
 			database.Close()
@@ -72,6 +74,7 @@ func printOptions() {
 	fmt.Println(quarterOption)
 	fmt.Println(fifthOption)
 	fmt.Println(sixthOption)
+	fmt.Println(seventhOption)
 	fmt.Println(exitOption)
 	fmt.Println(optionMessage)
 }
@@ -82,7 +85,7 @@ func executeUseCases(optionSelected string,
 	primaryKeysDeleter pk.PrimaryKeysDeleter,
 	foreignKeysCreator fk.ForeignKeysCreator,
 	foreignKeysDeleter fk.ForeignKeysDeleter,
-	databasesSynchronizer sync.DatabasesSynchronizer) bool {
+	databasesSynchronizer sync.DatabasesSynchronizer, db kit.Database) bool {
 	switch optionSelected {
 	case "1":
 		initializer.Execute()
@@ -102,6 +105,9 @@ func executeUseCases(optionSelected string,
 	case "6":
 		databasesSynchronizer.Execute()
 		return true
+	case "7":
+		kit.ShowStoredProcedures(db);
+		return true;
 	default:
 		return false
 	}
