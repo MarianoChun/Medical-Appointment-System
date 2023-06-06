@@ -2,125 +2,213 @@ package main
 
 import (
 	"fmt"
-	"time"
-
-	_ "github.com/lib/pq"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/fk"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/instance"
-	_ "gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/instance"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/pk"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sync"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/cmd/cli/app"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
+	"log"
+	"strconv"
 )
 
 const (
 	welcomeMessage    = "  ____                      _ _             _           \n / ___|___  _ __  ___ _   _| | |_ ___  _ __(_) ___  ___ \n| |   / _ \\| '_ \\/ __| | | | | __/ _ \\| '__| |/ _ \\/ __|\n| |__| (_) | | | \\__ \\ |_| | | || (_) | |  | | (_) \\__ \\\n \\____\\___/|_| |_|___/\\__,_|_|\\__\\___/|_|  |_|\\___/|___/\n                                                        \n    _    ____  __  __ ___ _   _ \n   / \\  |  _ \\|  \\/  |_ _| \\ | |\n  / _ \\ | | | | |\\/| || ||  \\| |\n / ___ \\| |_| | |  | || || |\\  |\n/_/   \\_\\____/|_|  |_|___|_| \\_|\n                                \n"
-	firstOption       = "1. Instanciar Base de datos"
-	secondOption      = "2. Crear PK's"
-	thirtyOption      = "3. Eliminar PK's"
-	quarterOption     = "4. Crear FK's"
-	fifthOption       = "5. Eliminar FK's"
-	sixthOption       = "6. Sincronizar NoSQL con SQL"
-	seventhOption     = "7. Ejecutar Stored Procedures"
-	exitOption        = "Para salir presione cualquier tecla"
-	errorInputMessage = "Ocurrió un error, intente nuevamente"
-	optionMessage     = "Ingrese una opcion:"
+	spMessage         = "     _                     _ \n ___| |_ ___  _ __ ___  __| |\n/ __| __/ _ \\| '__/ _ \\/ _` |\n\\__ \\ || (_) | | |  __/ (_| |\n|___/\\__\\___/|_|  \\___|\\__,_|\n                             \n                              _                     \n _ __  _ __ ___   ___ ___  __| |_   _ _ __ ___  ___ \n| '_ \\| '__/ _ \\ / __/ _ \\/ _` | | | | '__/ _ \\/ __|\n| |_) | | | (_) | (_|  __/ (_| | |_| | | |  __/\\__ \\\n| .__/|_|  \\___/ \\___\\___|\\__,_|\\__,_|_|  \\___||___/\n|_|                                                 \n"
+	mainFirstOption   = "1. Instanciar Base de datos"
+	mainSecondOption  = "2. Crear PK's"
+	mainThirtyOption  = "3. Eliminar PK's"
+	mainQuarterOption = "4. Crear FK's"
+	mainFifthOption   = "5. Eliminar FK's"
+	mainSixthOption   = "6. Sincronizar NoSQL con SQL"
+	mainSeventhOption = "7. Ejecutar Stored Procedures"
+
+	spFirstOption   = "1. Generar turnos disponibles"
+	spSecondOption  = "2. Atender turnos"
+	spThirtyOption  = "3. Cancelar turnos"
+	spQuarterOption = "4. Reservar turnos"
+	spFifthOption   = "5. Generar liquidación para obras sociales"
 )
 
 func main() {
-	database, err := kit.NewDatabase()
+	newApp, err := app.NewApp()
 	if err != nil {
 		return
 	}
 
-	initializer := instance.NewDatabaseInitializer(database)
-	primaryKeysCreator := pk.NewPrimaryKeysCreator(database)
-	primaryKeysDeleter := pk.NewPrimaryKeysDeleter(database)
-	foreignKeysCreator := fk.NewForeignKeysCreator(database)
-	foreignKeysDeleter := fk.NewForeignKeysDeleter(database)
-	databasesSynchronizer := sync.NewDatabasesSynchronizer(database)
+	executeMainOptions(newApp)
+}
 
+func executeMainOptions(app app.App) {
 	for {
-		printOptions()
+		kit.PrintOptions(welcomeMessage, mainFirstOption, mainSecondOption, mainThirtyOption, mainQuarterOption, mainFifthOption, mainSixthOption, mainSeventhOption)
 
-		optionSelected, err := scanOptionSelected()
+		optionSelected, err := kit.ScanOptionSelected()
 		if err != nil {
-			database.Close()
+			app.Database.Close()
 			break
 		}
 
-		continueExecution := executeUseCases(optionSelected,
-			initializer,
-			primaryKeysCreator,
-			primaryKeysDeleter,
-			foreignKeysCreator,
-			foreignKeysDeleter,
-			databasesSynchronizer,
-			database)
+		continueExecution := executeUseCases(optionSelected, app)
 
 		if !continueExecution {
-			database.Close()
+			app.Database.Close()
 			break
 		}
 	}
 }
 
-func printOptions() {
-	fmt.Println(welcomeMessage)
-	time.Sleep(1 * time.Second)
-	fmt.Println(firstOption)
-	fmt.Println(secondOption)
-	fmt.Println(thirtyOption)
-	fmt.Println(quarterOption)
-	fmt.Println(fifthOption)
-	fmt.Println(sixthOption)
-	fmt.Println(seventhOption)
-	fmt.Println(exitOption)
-	fmt.Println(optionMessage)
-}
-
-func executeUseCases(optionSelected string,
-	initializer instance.DatabaseInitializer,
-	primaryKeysCreator pk.PrimaryKeysCreator,
-	primaryKeysDeleter pk.PrimaryKeysDeleter,
-	foreignKeysCreator fk.ForeignKeysCreator,
-	foreignKeysDeleter fk.ForeignKeysDeleter,
-	databasesSynchronizer sync.DatabasesSynchronizer, db kit.Database) bool {
+func executeUseCases(optionSelected string, app app.App) bool {
 	switch optionSelected {
 	case "1":
-		initializer.Execute()
+		app.Initializer.Execute()
 		return true
 	case "2":
-		primaryKeysCreator.Execute()
+		app.PrimaryKeysCreator.Execute()
 		return true
 	case "3":
-		primaryKeysDeleter.Execute()
+		app.PrimaryKeysDeleter.Execute()
 		return true
 	case "4":
-		foreignKeysCreator.Execute()
+		app.ForeignKeysCreator.Execute()
 		return true
 	case "5":
-		foreignKeysDeleter.Execute()
+		app.ForeignKeysDeleter.Execute()
 		return true
 	case "6":
-		databasesSynchronizer.Execute()
+		app.DatabasesSynchronizer.Execute()
 		return true
 	case "7":
-		kit.ShowStoredProcedures(db);
-		return true;
+		showStoredProcedures(app)
+		return true
 	default:
 		return false
 	}
 }
 
-func scanOptionSelected() (string, error) {
-	var optionSelected string
-	_, err := fmt.Scanln(&optionSelected)
+func showStoredProcedures(app app.App) {
+	executing := true
 
+	for executing {
+		kit.PrintOptions(spMessage, spFirstOption, spSecondOption, spThirtyOption, spQuarterOption, spFifthOption)
+		option, err := kit.ScanOptionSelected()
+		if err != nil {
+			log.Fatalln(err)
+			return
+		}
+
+		executing = executeStoredProcedures(option, app)
+	}
+}
+
+func executeStoredProcedures(optionSelected string, app app.App) bool {
+	switch optionSelected {
+	case "1":
+		executeAppointmentGenerator(app)
+		return true
+	case "2":
+		executeAppointmentAttender(app)
+		return true
+	case "3":
+		executeAppointmentCanceller(app)
+		return true
+	case "4":
+		executeAppointmentReserver(app)
+		return true
+	case "5":
+		executeInsuranceSettlementGenerator(app)
+		return true
+	default:
+		return false
+	}
+}
+
+func executeAppointmentGenerator(app app.App) {
+	date, err := kit.ScanMonthAndYear()
 	if err != nil {
-		fmt.Println(errorInputMessage)
-		return "", err
+		log.Fatalln(err)
+		return
 	}
 
-	return optionSelected, nil
+	app.AppointmentGenerator.Execute(date.Year(), date.Month())
+}
+
+func executeAppointmentAttender(app app.App) {
+	appointmentNumberStr, err := kit.ScanOptionSelectedWithMessage("Indique el nro de turno")
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	appointmentNumber, err := strconv.Atoi(appointmentNumberStr)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	app.AppointmentAttender.Execute(appointmentNumber)
+}
+
+func executeInsuranceSettlementGenerator(app app.App) {
+	app.InsuranceSettlementGenerator.Execute()
+}
+
+func executeAppointmentReserver(app app.App) {
+	clinicHistoryNumberStr, err := kit.ScanOptionSelectedWithMessage("Indique el nro de historia clinica")
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	clinicHistoryNumber, err := strconv.Atoi(clinicHistoryNumberStr)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	dniStr, err := kit.ScanOptionSelectedWithMessage("Indique el dni")
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	dni, err := strconv.Atoi(dniStr)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	date, err := kit.ScanDate()
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	app.AppointmentReserver.Execute(clinicHistoryNumber, dni, date)
+}
+
+func executeAppointmentCanceller(app app.App) {
+	fmt.Println("A continuacion indicará la fecha desde")
+	dateFrom, err := kit.ScanDate()
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	fmt.Println("A continuacion indicará la fecha hasta")
+	dateTo, err := kit.ScanDate()
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	dniStr, err := kit.ScanOptionSelectedWithMessage("Indique el dni")
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	dni, err := strconv.Atoi(dniStr)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	app.AppointmentCanceller.Execute(dni, dateFrom, dateTo)
 }

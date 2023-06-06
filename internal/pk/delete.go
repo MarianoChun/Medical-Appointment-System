@@ -1,34 +1,33 @@
 package pk
 
 import (
-	"fmt"
 	"log"
 
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 const (
-	path_to_pk_deletion = "sql/pk/remove.sql"
-	deletion_error_message = "Ocurrió un error al eliminar las primary keys"
-	deletion_message = "Eliminando Primary Keys para las relaciones"
+	pathToPkDeletion     = "sql/pk/remove.sql"
+	deletionErrorMessage = "Ocurrió un error al eliminar las primary keys"
+	deletionMessage      = "Eliminando Primary Keys para las relaciones"
 )
 
-type PrimaryKeysDeleter struct {
+type Deleter struct {
 	db kit.Database
 }
 
-func NewPrimaryKeysDeleter(db kit.Database) PrimaryKeysDeleter {
-	return PrimaryKeysDeleter{
+func NewPrimaryKeysDeleter(db kit.Database) Deleter {
+	return Deleter{
 		db: db,
 	}
 }
 
-func (s PrimaryKeysDeleter) Execute() {
-	fmt.Println(deletion_message);
-	err := kit.ExecuteScript(path_to_pk_deletion, s.db.App())
+func (s Deleter) Execute() {
+	log.Println(deletionMessage)
+
+	err := kit.ExecuteScript(pathToPkDeletion, s.db.App())
 	if err != nil {
-			log.Fatalln(deletion_error_message, err)
+		log.Fatalln(deletionErrorMessage, err)
 		return
 	}
-
 }

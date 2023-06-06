@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/boltdb/bolt"
+	_ "github.com/lib/pq"
 	"log"
 )
 

@@ -12,9 +12,9 @@ func AppointmentAttender(db Database) {
 	var executing = true
 
 	for executing {
-		printOptions(options)
+		PrintOptions("", options...)
 
-		option, err := scanOptionSelected("Seleccione una opcion")
+		option, err := ScanOptionSelectedWithMessage("Seleccione una opcion")
 		if err != nil {
 			log.Fatalln(err)
 			return
@@ -34,7 +34,7 @@ func AppointmentAttender(db Database) {
 }
 
 func attendAppointment(db *sql.DB) {
-	app, err := scanOptionSelected("Ingrese el numero de turno a atender")
+	app, err := ScanOptionSelectedWithMessage("Ingrese el numero de turno a atender")
 	if err != nil {
 		db.Close()
 	}

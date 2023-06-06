@@ -1,7 +1,6 @@
 package fk
 
 import (
-	"fmt"
 	"log"
 
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
@@ -14,18 +13,18 @@ const (
 	deletionErrorMessage   = "Ocurrió un error al eliminar las foreign keys"
 )
 
-type ForeignKeysDeleter struct {
+type Deleter struct {
 	db kit.Database
 }
 
-func NewForeignKeysDeleter(db kit.Database) ForeignKeysDeleter {
-	return ForeignKeysDeleter{
+func NewForeignKeysDeleter(db kit.Database) Deleter {
+	return Deleter{
 		db: db,
 	}
 }
 
-func (s ForeignKeysDeleter) Execute() {
-	fmt.Println(deletionMessage)
+func (s Deleter) Execute() {
+	log.Println(deletionMessage)
 
 	err := kit.ExecuteScript(pathToFkDeletion, s.db.App())
 
@@ -34,5 +33,5 @@ func (s ForeignKeysDeleter) Execute() {
 		return
 	}
 
-	fmt.Println(deletionSuccessMessage)
+	log.Println(deletionSuccessMessage)
 }

@@ -1,7 +1,6 @@
 package sync
 
 import (
-	"fmt"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
@@ -16,5 +15,4 @@ func NewDatabasesSynchronizer(db kit.Database) DatabasesSynchronizer {
 }
 
 func (s DatabasesSynchronizer) Execute() {
-	fmt.Println("Sync Database")
 }

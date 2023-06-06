@@ -1,34 +1,33 @@
 package pk
 
 import (
-	"fmt"
 	"log"
 
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 const (
-	path_to_pk_creation = "sql/pk/create.sql"
-	creation_error_message = "Ocurrió un error al crear las primary keys"
-	creation_message = "Creando Primary Keys para las relaciones"
+	pathToPkCreation     = "sql/pk/create.sql"
+	creationErrorMessage = "Ocurrió un error al crear las primary keys"
+	creationMessage      = "Creando Primary Keys para las relaciones"
 )
 
-type PrimaryKeysCreator struct {
+type Creator struct {
 	db kit.Database
 }
 
-func NewPrimaryKeysCreator(db kit.Database) PrimaryKeysCreator {
-	return PrimaryKeysCreator{
+func NewPrimaryKeysCreator(db kit.Database) Creator {
+	return Creator{
 		db: db,
 	}
 }
 
-func (s PrimaryKeysCreator) Execute() {
-	fmt.Println(creation_message);
-	err := kit.ExecuteScript(path_to_pk_creation, s.db.App())
+func (s Creator) Execute() {
+	log.Println(creationMessage)
+
+	err := kit.ExecuteScript(pathToPkCreation, s.db.App())
 	if err != nil {
-		log.Fatalln(creation_error_message, err)
+		log.Fatalln(creationErrorMessage, err)
 		return
 	}
-
 }
