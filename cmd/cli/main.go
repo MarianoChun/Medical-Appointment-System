@@ -126,7 +126,7 @@ func executeAppointmentGenerator(app app.App) {
 		return
 	}
 
-	app.Appointment.Generate(date.Year(), date.Month())
+	app.Appointment.Generate(date.Year(), int(date.Month()))
 }
 
 func executeAppointmentAttender(app app.App) {
