@@ -16,9 +16,8 @@ func ShowStoredProcedures(db Database) {
                                           |_|                                                                 
 
 	`
-	options := []string{title, "1. Generar turnos disponibles"}
+	options := []string{title, "1. Generar turnos disponibles", "2. Atender turnos"}
 	executing := true
-
 
 	for executing {
 		printOptions(options)
@@ -29,12 +28,15 @@ func ShowStoredProcedures(db Database) {
 		}
 
 		switch option {
-			case "1":
-				AppointmentDateGenerator(db)
-				break;
-			default:
-				executing = false
-				break
+		case "1":
+			AppointmentDateGenerator(db)
+			break
+		case "2":
+			AppointmentAttender(db)
+			break
+		default:
+			executing = false
+			break
 		}
 	}
 }
@@ -47,7 +49,7 @@ func printOptions(options []string) {
 }
 
 func scanOptionSelected(msg string) (string, error) {
-	println(msg);
+	println(msg)
 	var optionSelected string
 	_, err := fmt.Scanln(&optionSelected)
 
