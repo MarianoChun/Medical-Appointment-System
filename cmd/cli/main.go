@@ -24,6 +24,7 @@ const (
 	spThirtyOption  = "3. Cancelar turnos"
 	spQuarterOption = "4. Reservar turnos"
 	spFifthOption   = "5. Generar liquidación para obras sociales"
+	spSixthOption   = "6. Enviar emails de inasistencia"
 )
 
 func main() {
@@ -86,7 +87,7 @@ func showStoredProcedures(app app.App) {
 	executing := true
 
 	for executing {
-		kit.PrintOptions(spMessage, spFirstOption, spSecondOption, spThirtyOption, spQuarterOption, spFifthOption)
+		kit.PrintOptions(spMessage, spFirstOption, spSecondOption, spThirtyOption, spQuarterOption, spFifthOption, spSixthOption)
 		option, err := kit.ScanOptionSelected()
 		if err != nil {
 			log.Fatalln(err)
@@ -114,9 +115,16 @@ func executeStoredProcedures(optionSelected string, app app.App) bool {
 	case "5":
 		executeInsuranceSettlementGenerator(app)
 		return true
+	case "6":
+		executeAnsenceEmailsSender(app)
+		return true
 	default:
 		return false
 	}
+}
+
+func executeAnsenceEmailsSender(app app.App) {
+	app.EmailService.SendAbsenseEmails()
 }
 
 func executeAppointmentGenerator(app app.App) {

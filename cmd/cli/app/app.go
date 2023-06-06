@@ -5,6 +5,7 @@ import (
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/fk"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/pk"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sp/appointment"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sp/email"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal/sp/insurance"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
@@ -16,6 +17,7 @@ type App struct {
 	ForeignKeysService fk.Service
 	Appointment        appointment.Service
 	InsuranceService   insurance.Service
+	EmailService       email.Service
 }
 
 func NewApp() (App, error) {
@@ -31,6 +33,7 @@ func NewApp() (App, error) {
 		ForeignKeysService: fk.NewService(database),
 		Appointment:        appointment.NewService(database),
 		InsuranceService:   insurance.NewService(database),
+		EmailService:       email.NewService(database),
 	}, nil
 }
 
