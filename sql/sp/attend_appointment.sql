@@ -30,7 +30,7 @@ declare
 begin
     select max(nro_error) into errorNumber from error;
 
-    if nro_error is null then
+    if errorNumber is null then
         errorNumber = 0;
     end if;
 
