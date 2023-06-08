@@ -133,3 +133,12 @@ create table envio_email(
     f_envio timestamp,
     estado char(10)
 );
+
+drop table if exists solicitud_reservas;
+create table solicitud_reservas(
+    nro_orden int,
+    nro_paciente int,
+    dni_medique int,
+    fecha date,
+    hora time
+);
