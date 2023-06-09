@@ -17,7 +17,8 @@ const (
 	mainQuarterOption = "4. Crear FK's"
 	mainFifthOption   = "5. Eliminar FK's"
 	mainSixthOption   = "6. Sincronizar NoSQL con SQL"
-	mainSeventhOption = "7. Ejecutar Stored Procedures"
+	mainSeventhOption = "7. Ver datos NoSQL"
+	mainEightOption   = "8. Ejecutar Stored Procedures"
 
 	spFirstOption   = "1. Generar turnos disponibles"
 	spSecondOption  = "2. Atender turnos"
@@ -38,7 +39,7 @@ func main() {
 
 func executeMainOptions(app app.App) {
 	for {
-		kit.PrintOptions(welcomeMessage, mainFirstOption, mainSecondOption, mainThirtyOption, mainQuarterOption, mainFifthOption, mainSixthOption, mainSeventhOption)
+		kit.PrintOptions(welcomeMessage, mainFirstOption, mainSecondOption, mainThirtyOption, mainQuarterOption, mainFifthOption, mainSixthOption, mainSeventhOption, mainEightOption)
 
 		optionSelected, err := kit.ScanOptionSelected()
 		if err != nil {
@@ -76,6 +77,9 @@ func executeUseCases(optionSelected string, app app.App) bool {
 		app.DatabaseService.SyncBetweenSQLAndNoSQL()
 		return true
 	case "7":
+		app.DatabaseService.ViewNoSQL()
+		return true
+	case "8":
 		showStoredProcedures(app)
 		return true
 	default:
