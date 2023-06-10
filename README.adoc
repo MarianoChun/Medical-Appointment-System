@@ -7,7 +7,10 @@ Agustín Lautaro Escobar <agustinesco@outlook.es>
 
 1. Tuvimos dificultad en visualizar las relaciones entre las tablas, para solucionar esto usamos el DER 
 2. Nos encontramos problemas a la hora de generar data para popular las tablas de la base de datos para lo que recurrimos a la pagina https://www.mockaroo.com[Mockaroo] la cual nos permite generar n cantidad de filas para las tablas
-
+3. Al momento de reservar los turnos, nos encontramos con la dificultad de tener que matchear los timestamp que solicita el paciente con el que figura en el turno disponible. El problema
+era que al momento de hacer la comparación, el cliente solo pasa la fecha y hora del turno que quiere, pero no especifica minutos. Esto último si figura en los turnos generados, por lo que se dio uso
+de la funcion date_trunc('hour' [turnoASolicitar]) para extraer del timestamp del turno unicamente la fecha y la hora, dejando los minutos en cero. De esta forma, hacemos que coincida con el formato del timestamp solicitado por el paciente
+y que se efectue el sp de forma correcta.
 == Implementación
 
 .Creación de la db y los schemas
