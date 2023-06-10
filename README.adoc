@@ -11,6 +11,8 @@ Agustín Lautaro Escobar <agustinesco@outlook.es>
 era que al momento de hacer la comparación, el cliente solo pasa la fecha y hora del turno que quiere, pero no especifica minutos. Esto último si figura en los turnos generados, por lo que se dio uso
 de la funcion date_trunc('hour' [turnoASolicitar]) para extraer del timestamp del turno unicamente la fecha y la hora, dejando los minutos en cero. De esta forma, hacemos que coincida con el formato del timestamp solicitado por el paciente
 y que se efectue el sp de forma correcta.
+4. Tuvimos un problema a la hora de crear los SP para la generación de turnos disponibles y envio mail, en una primera iteracion intentamos usar el metodo max(id) para obtener el maximo id y despues sumarle 1, pero decidimos cambiar el enfoque y hacer los ids de las tablas necesarias a serial
+ 
 == Implementación
 
 .Creación de la db y los schemas
