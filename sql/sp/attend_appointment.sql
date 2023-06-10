@@ -5,13 +5,13 @@ begin
     select * from turno where nro_turno = appointment_number into appointment;
     case 
         when not found then
-            perform create_attend_appointment_error('?nro de turno no válido.', appointment);
+            insert into error(operacion, f_error, motivo) values ('atención', now(), '?nro de turno no válido.');
             return false;
         when appointment.fecha::date != now()::date then
-            perform create_attend_appointment_error('?turno no corresponde a la fecha del día.', appointment);
+            insert into error(operacion, f_error, motivo) values ('atención', now(), '?turno no corresponde a la fecha del día.');
             return false;
         when appointment.estado != 'reservado' then
-            perform create_attend_appointment_error('?turno no reservado.', appointment);
+            insert into error(operacion, f_error, motivo) values ('atención', now(), '?turno no reservado.');
             return false;
         else
             update turno
@@ -19,15 +19,5 @@ begin
             where nro_turno = appointment_number;
             return true;
     end case;    
-end;
-$$ language plpgsql;
-
-create or replace function create_attend_appointment_error(msg text, appointment record) returns void as $$
-begin
-    if appointment.nro_turno is null then
-        insert into error(operacion, f_error, motivo) values ('atención', now(), msg);
-    else
-        insert into error(f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (appointment.fecha, appointment.nro_consultorio, appointment.dni_medique, appointment.nro_paciente , 'atención', now(), msg);
-    end if;
 end;
 $$ language plpgsql;
