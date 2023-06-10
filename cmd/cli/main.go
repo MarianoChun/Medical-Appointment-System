@@ -162,7 +162,7 @@ func executeInsuranceSettlementGenerator(app app.App) {
 }
 
 func executeAppointmentReserver(app app.App) {
-	clinicHistoryNumberStr, err := kit.ScanOptionSelectedWithMessage("Indique el nro de historia clinica")
+	clinicHistoryNumberStr, err := kit.ScanOptionSelectedWithMessage("Indique el nro de historia clinica del paciente")
 	if err != nil {
 		log.Fatalln(err)
 		return
@@ -174,7 +174,7 @@ func executeAppointmentReserver(app app.App) {
 		return
 	}
 
-	dniStr, err := kit.ScanOptionSelectedWithMessage("Indique el dni")
+	dniStr, err := kit.ScanOptionSelectedWithMessage("Indique el dni del medique")
 	if err != nil {
 		log.Fatalln(err)
 		return
@@ -186,7 +186,7 @@ func executeAppointmentReserver(app app.App) {
 		return
 	}
 
-	date, err := kit.ScanDate()
+	date, err := kit.ScanDateAndHour()
 	if err != nil {
 		log.Fatalln(err)
 		return

@@ -1,4 +1,4 @@
-create or replace function reserve_appointment(nro_historia_clinica integer, dni_medique_reserva integer, fecha date, hora time) returns boolean as $$
+create or replace function reserve_appointment(nro_historia_clinica integer, dni_medique_reserva integer, fechaHora timestamp) returns boolean as $$
 declare
     result record;
     turnoAReservar record;
@@ -7,7 +7,7 @@ declare
     turnosReservadosPaciente integer;
     montoPaciente decimal(12,2);
     montoObraSocial decimal(12,2);
-    timestampTurno timestamp;
+    timeStampTurnoSolicitado timestamp := fechaHora;
     errorCount integer;
 begin
     select * into result from medique where medique.dni_medique = dni_medique_reserva;
@@ -39,8 +39,7 @@ begin
         select into nroAfiliadePaciente nro_afiliade from paciente where paciente.nro_paciente = nro_historia_clinica;
     end if;
 
-    timestampTurno := fecha + hora;
-    select * into turnoAReservar from turno where turno.fecha = timestampTurno and turno.dni_medique = dni_medique_reserva;
+    select * into turnoAReservar from turno where turno.fecha = timeStampTurnoSolicitado and turno.dni_medique = dni_medique_reserva;
     if not found or turnoAReservar.estado != 'disponible' then
         select count(*) into errorCount from error;
         insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?turno inexistente ó no disponible');

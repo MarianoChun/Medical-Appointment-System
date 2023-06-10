@@ -91,6 +91,57 @@ func ScanDate() (time.Time, error) {
 	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC), nil
 }
 
+func ScanDateAndHour() (time.Time, error) {
+	yearStr, err := ScanOptionSelectedWithMessage("Indique el año")
+	if err != nil {
+		log.Fatalln(err)
+		return time.Time{}, err
+	}
+
+	year, err := strconv.Atoi(yearStr)
+	if err != nil {
+		log.Fatalln(err)
+		return time.Time{}, err
+	}
+
+	monthStr, err := ScanOptionSelectedWithMessage("Indique el mes")
+	if err != nil {
+		log.Fatalln(err)
+		return time.Time{}, err
+	}
+
+	month, err := strconv.Atoi(monthStr)
+	if err != nil {
+		log.Fatalln(err)
+		return time.Time{}, err
+	}
+
+	dayStr, err := ScanOptionSelectedWithMessage("Indique el dia")
+	if err != nil {
+		log.Fatalln(err)
+		return time.Time{}, err
+	}
+
+	day, err := strconv.Atoi(dayStr)
+	if err != nil {
+		log.Fatalln(err)
+		return time.Time{}, err
+	}
+
+	hourStr, err := ScanOptionSelectedWithMessage("Indique la hora")
+	if err != nil {
+		log.Fatalln(err)
+		return time.Time{}, err
+	}
+
+	hour, err := strconv.Atoi(hourStr)
+	if err != nil {
+		log.Fatalln(err)
+		return time.Time{}, err
+	}
+
+	return time.Date(year, time.Month(month), day, hour, 0, 0, 0, time.UTC), nil
+}
 func ScanOptionSelected() (string, error) {
 	return ScanOptionSelectedWithMessage("")
 }

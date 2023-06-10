@@ -65,8 +65,8 @@ func (s Service) Generate(year int, month int) {
 	}
 }
 
-func (s Service) Reserve(clinicHistoryNumber int, dni int, date time.Time) {
-	query := fmt.Sprintf("select reserve_appointment(%s, %s, '%s');", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dni), kit.TimeToDateTimeString(date))
+func (s Service) Reserve(clinicHistoryNumber, dniMedique int, date time.Time) {
+	query := fmt.Sprintf("select reserve_appointment(%s, %s, '%s');", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dniMedique), kit.TimeToDateTimeString(date))
 
 	var result bool
 	err := s.db.App().QueryRow(query).Scan(&result)
@@ -76,8 +76,8 @@ func (s Service) Reserve(clinicHistoryNumber int, dni int, date time.Time) {
 	}
 
 	if result {
-		fmt.Printf("Se ha reservado turno para la historia clinica %s y dni %s \n", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dni))
+		fmt.Printf("Se ha reservado turno para la historia clinica %s y dniMedique %s \n", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dniMedique))
 	} else {
-		fmt.Printf("No se ha reservado turno para la historia clinica %s y dni %s \n", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dni))
+		fmt.Printf("No se ha reservado turno para la historia clinica %s y dniMedique %s \n", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dniMedique))
 	}
 }
