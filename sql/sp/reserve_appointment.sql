@@ -3,7 +3,7 @@ declare
     result record;
     turnoAReservar record;
     nroObraSocialPaciente integer;
-    nroAfiliadePaciente integer = null;
+    nroAfiliadePaciente integer := null;
     turnosReservadosPaciente integer;
     montoPaciente decimal(12,2);
     montoObraSocial decimal(12,2);
@@ -13,8 +13,7 @@ begin
     select * into result from medique where medique.dni_medique = dni_medique_reserva;
     if not found then
         select count(*) into errorCount from error;
-        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo)
-        values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?dni de médique no válido');
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?dni de médique no válido');
         raise notice 'No existe un medique con dicho dni, ingrese un dni existente';
         return false;
     end if;
@@ -22,8 +21,7 @@ begin
     select * into result from paciente where paciente.nro_paciente = nro_historia_clinica;
     if not found then
         select count(*) into errorCount from error;
-        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo)
-        values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?nro de historia clínica no válido');
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?nro de historia clínica no válido');
         raise notice 'No existe un paciente con dicho nro de historia clinica, ingrese uno existente';
         return false;
     end if;
@@ -33,8 +31,7 @@ begin
         select * into result from cobertura where cobertura.dni_medique = dni_medique_reserva and cobertura.nro_obra_social = nroObraSocialPaciente;
         if not found then
             select count(*) into errorCount from error;
-            insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo)
-            values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?obra social de paciente no atendida por le médique');
+            insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?obra social de paciente no atendida por le médique');
             raise notice 'La obra social del paciente no es atendida por le médique';
             return false;
         end if;
@@ -46,22 +43,19 @@ begin
     select * into turnoAReservar from turno where turno.fecha = timestampTurno and turno.dni_medique = dni_medique_reserva;
     if not found or turnoAReservar.estado != 'disponible' then
         select count(*) into errorCount from error;
-        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo)
-        values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?turno inexistente ó no disponible');
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?turno inexistente ó no disponible');
         raise notice 'El turno es inexistente ó no esta disponible';
         return false;
     end if;
 
     turnosReservadosPaciente := count_reserved_appointments_for_patient(nro_historia_clinica);
-    if turnosReservadosPaciente == 5 then
+    if turnosReservadosPaciente = 5 then
         select count(*) into errorCount from error;
-        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo)
-        values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?supera límite de reserva de turnos');
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (errorCount + 1, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?supera límite de reserva de turnos');
         raise notice 'El turno a reservar supera el límite de reserva de turnos';
         return false;
     end if;
 
-    -- Calculo monto obra social y paciente
     if nroObraSocialpaciente is null then
         select monto_consulta_privada into montoPaciente from medique where dni_medique = dni_medique_reserva;
     else
