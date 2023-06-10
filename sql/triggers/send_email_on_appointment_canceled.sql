@@ -1,7 +1,7 @@
 create or replace function send_email_on_appointment_canceled() returns trigger as $$
 declare
     result record;
-    email_title varchar;
+    email_title varchar := 'Cancelación de turno';
     email_body varchar;
 begin
     if new.estado = old.estado then
@@ -24,7 +24,6 @@ begin
     and m.dni_medique = t.dni_medique
     and t.nro_turno = old.nro_turno;
 
-    email_title := 'Cancelación de turno';
     email_body := concat('¡Hola, ', result.nombre_paciente,'! Su turno con el medico ', result.nombre_medique, ' del día ', result.fecha_turno , ' ha sido cancelado. Pronto el centro de atención se contactará con usted.');
 
     select send_email(result.email_paciente, email_title, email_body);

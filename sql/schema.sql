@@ -1,6 +1,6 @@
 drop table if exists paciente;
 create table paciente(
-    nro_paciente int,
+    nro_paciente serial,
     nombre text,
     apellido text,
     dni_paciente int,
@@ -24,7 +24,7 @@ create table medique(
 
 drop table if exists consultorio;
 create table consultorio(
-    nro_consultorio int,
+    nro_consultorio serial,
     nombre text,
     domicilio text,
     codigo_postal char(8),
@@ -43,7 +43,7 @@ create table agenda(
 
 drop table if exists turno;
 create table turno(
-    nro_turno int,
+    nro_turno serial,
     fecha timestamp,
     nro_consultorio int,
     dni_medique int,
@@ -70,7 +70,7 @@ create table reprogramacion(
 
 drop table if exists error;
 create table error(
-    nro_error int,
+    nro_error serial,
     f_turno timestamp,
     nro_consultorio int,
     dni_medique int,
@@ -90,7 +90,7 @@ create table cobertura(
 
 drop table if exists obra_social;
 create table obra_social (
-    nro_obra_social int,
+    nro_obra_social serial,
     nombre text,
     contacto_nombre text,
     contacto_apellido text,
@@ -100,7 +100,7 @@ create table obra_social (
 
 drop table if exists liquidacion_cabecera;
 create table liquidacion_cabecera(
-    nro_liquidacion int,
+    nro_liquidacion serial,
     nro_obra_social int,
     desde date,
     hasta date,
@@ -125,7 +125,7 @@ create table liquidacion_detalle(
 
 drop table if exists envio_email;
 create table envio_email(
-    nro_email int,
+    nro_email serial,
     f_generacion timestamp,
     email_paciente text,
     asunto text,
