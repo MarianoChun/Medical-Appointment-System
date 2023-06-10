@@ -7,12 +7,9 @@ declare
     any_appointment_in_range boolean;
     medic_agenda record;
     agenda_time timestamp;
-    appointment_number int;
 begin
     start_of_month := make_timestamp(year, month, 1, 0, 0, 0);
     end_of_month := start_of_month + interval '1 month - 1 day';
-    
-
 
     select exists(select 1 from turno  where fecha between start_of_month and end_of_month) into any_appointment_in_range;
     if any_appointment_in_range then
@@ -22,14 +19,8 @@ begin
                 for medic in select * from medique loop
                     select  * from agenda where dni_medique = medic.dni_medique and dia = date_part('dow', current_day) into medic_agenda;
                     for agenda_time in select generate_series(current_day + medic_agenda.hora_desde, current_day + medic_agenda.hora_hasta, medic_agenda.duracion_turno) loop
-                        select max(nro_turno) into appointment_number from turno;
-
-                        if appointment_number is null then
-                            appointment_number = 0;
-                        end if;
-
-                        insert into turno (nro_turno, fecha, nro_consultorio, dni_medique, estado)
-                        values (appointment_number + 1, agenda_time, medic_agenda.nro_consultorio, medic.dni_medique, 'disponible');
+                        insert into turno (fecha, nro_consultorio, dni_medique, estado)
+                        values (agenda_time, medic_agenda.nro_consultorio, medic.dni_medique, 'disponible');
                     end loop;
                 end loop;
             end loop;   

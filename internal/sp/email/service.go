@@ -15,12 +15,14 @@ func NewService(db kit.Database) Service {
 	}
 }
 
-func (s Service) SendAbsenseEmails() {
+func (s Service) SendAbsenseEmails() error {
 	query := "select send_absence_emails();"
 
 	err := kit.ExecuteQuery(query, s.db.App())
 	if err != nil {
 		log.Fatal(err)
-		return
+		return err
 	}
+
+	return nil
 }

@@ -15,12 +15,14 @@ func NewService(db kit.Database) Service {
 	}
 }
 
-func (s Service) GenerateSettlements() {
+func (s Service) GenerateSettlements() error {
 	query := "select generate_insurance_settlements();"
 
 	err := kit.ExecuteQuery(query, s.db.App())
 	if err != nil {
 		log.Fatal(err)
-		return
+		return err
 	}
+
+	return nil
 }
