@@ -9,23 +9,39 @@ import (
 )
 
 const (
-	welcomeMessage    = "  ____                      _ _             _           \n / ___|___  _ __  ___ _   _| | |_ ___  _ __(_) ___  ___ \n| |   / _ \\| '_ \\/ __| | | | | __/ _ \\| '__| |/ _ \\/ __|\n| |__| (_) | | | \\__ \\ |_| | | || (_) | |  | | (_) \\__ \\\n \\____\\___/|_| |_|___/\\__,_|_|\\__\\___/|_|  |_|\\___/|___/\n                                                        \n    _    ____  __  __ ___ _   _ \n   / \\  |  _ \\|  \\/  |_ _| \\ | |\n  / _ \\ | | | | |\\/| || ||  \\| |\n / ___ \\| |_| | |  | || || |\\  |\n/_/   \\_\\____/|_|  |_|___|_| \\_|\n                                \n"
-	spMessage         = "     _                     _ \n ___| |_ ___  _ __ ___  __| |\n/ __| __/ _ \\| '__/ _ \\/ _` |\n\\__ \\ || (_) | | |  __/ (_| |\n|___/\\__\\___/|_|  \\___|\\__,_|\n                             \n                              _                     \n _ __  _ __ ___   ___ ___  __| |_   _ _ __ ___  ___ \n| '_ \\| '__/ _ \\ / __/ _ \\/ _` | | | | '__/ _ \\/ __|\n| |_) | | | (_) | (_|  __/ (_| | |_| | | |  __/\\__ \\\n| .__/|_|  \\___/ \\___\\___|\\__,_|\\__,_|_|  \\___||___/\n|_|                                                 \n"
-	mainFirstOption   = "1. Instanciar Base de datos"
-	mainSecondOption  = "2. Crear PK's"
-	mainThirtyOption  = "3. Eliminar PK's"
-	mainQuarterOption = "4. Crear FK's"
-	mainFifthOption   = "5. Eliminar FK's"
-	mainSixthOption   = "6. Sincronizar NoSQL con SQL"
-	mainSeventhOption = "7. Ver datos NoSQL"
-	mainEightOption   = "8. Ejecutar Stored Procedures"
+	welcomeMessage = "  ____                      _ _             _           \n / ___|___  _ __  ___ _   _| | |_ ___  _ __(_) ___  ___ \n| |   / _ \\| '_ \\/ __| | | | | __/ _ \\| '__| |/ _ \\/ __|\n| |__| (_) | | | \\__ \\ |_| | | || (_) | |  | | (_) \\__ \\\n \\____\\___/|_| |_|___/\\__,_|_|\\__\\___/|_|  |_|\\___/|___/\n                                                        \n    _    ____  __  __ ___ _   _ \n   / \\  |  _ \\|  \\/  |_ _| \\ | |\n  / _ \\ | | | | |\\/| || ||  \\| |\n / ___ \\| |_| | |  | || || |\\  |\n/_/   \\_\\____/|_|  |_|___|_| \\_|\n                                \n"
+	pkMessage      = " ____       _                              _  __              \n|  _ \\ _ __(_)_ __ ___   __ _ _ __ _   _  | |/ /___ _   _ ___ \n| |_) | '__| | '_ ` _ \\ / _` | '__| | | | | ' // _ \\ | | / __|\n|  __/| |  | | | | | | | (_| | |  | |_| | | . \\  __/ |_| \\__ \\\n|_|   |_|  |_|_| |_| |_|\\__,_|_|   \\__, | |_|\\_\\___|\\__, |___/\n                                   |___/            |___/   "
+	fkMessage      = " _____              _               _  __              \n|  ___|__  _ __ ___(_) __ _ _ __   | |/ /___ _   _ ___ \n| |_ / _ \\| '__/ _ \\ |/ _` | '_ \\  | ' // _ \\ | | / __|\n|  _| (_) | | |  __/ | (_| | | | | | . \\  __/ |_| \\__ \\\n|_|  \\___/|_|  \\___|_|\\__, |_| |_| |_|\\_\\___|\\__, |___/\n                      |___/                  |___/     \n"
+	tgMessage      = " _____     _                           \n|_   _| __(_) __ _  __ _  ___ _ __ ___ \n  | || '__| |/ _` |/ _` |/ _ \\ '__/ __|\n  | || |  | | (_| | (_| |  __/ |  \\__ \\\n  |_||_|  |_|\\__, |\\__, |\\___|_|  |___/\n             |___/ |___/               \n"
+	spMessage      = "     _                     _ \n ___| |_ ___  _ __ ___  __| |\n/ __| __/ _ \\| '__/ _ \\/ _` |\n\\__ \\ || (_) | | |  __/ (_| |\n|___/\\__\\___/|_|  \\___|\\__,_|\n                             \n                              _                     \n _ __  _ __ ___   ___ ___  __| |_   _ _ __ ___  ___ \n| '_ \\| '__/ _ \\ / __/ _ \\/ _` | | | | '__/ _ \\/ __|\n| |_) | | | (_) | (_|  __/ (_| | |_| | | |  __/\\__ \\\n| .__/|_|  \\___/ \\___\\___|\\__,_|\\__,_|_|  \\___||___/\n|_|                                                 \n"
+	noSqlMessage   = " _   _      ____   ___  _     \n| \\ | | ___/ ___| / _ \\| |    \n|  \\| |/ _ \\___ \\| | | | |    \n| |\\  | (_) |__) | |_| | |___ \n|_| \\_|\\___/____/ \\__\\_\\_____|\n                              \n"
 
-	spFirstOption   = "1. Generar turnos disponibles"
-	spSecondOption  = "2. Atender turnos"
-	spThirtyOption  = "3. Cancelar turnos"
-	spQuarterOption = "4. Reservar turnos"
-	spFifthOption   = "5. Generar liquidación para obras sociales"
-	spSixthOption   = "6. Enviar emails de inasistencia"
+	mainFirstOption   = "1.  Crear Base de datos"
+	mainSecondOption  = "2.  Insertar datos"
+	mainThirtyOption  = "3.  Administración de Primary Keys"
+	mainQuarterOption = "4.  Administración de Foreign Keys"
+	mainFifthOption   = "5.  Administración de Stored Procedures"
+	mainSixthOption   = "6.  Administración Triggers"
+	mainSeventhOption = "7.  Administración de NoSQL"
+
+	pkFirstOption  = "1. Crear Primary Keys"
+	pkSecondOption = "2. Eliminar Primary Keys"
+
+	fkFirstOption  = "1. Crear Foreign Keys"
+	fkSecondOption = "2. Eliminar Foreign Keys"
+
+	triggerFirstOption = "1. Crear Triggers"
+
+	noSqlFirstOption  = "1. Sincronizar Bases de datos"
+	noSqlSecondOption = "2. Ver datos"
+
+	spFirstOption   = "1. Crear Stored Procedures"
+	spSecondOption  = "2. Generar turnos disponibles"
+	spThirtyOption  = "3. Atender turnos"
+	spQuarterOption = "4. Cancelar turnos"
+	spFifthOption   = "5. Reservar turnos"
+	spSixthOption   = "6. Generar liquidación para obras sociales"
+	spSeventhOption = "7. Enviar emails de inasistencia"
 )
 
 func main() {
@@ -39,7 +55,7 @@ func main() {
 
 func executeMainOptions(app app.App) {
 	for {
-		kit.PrintOptions(welcomeMessage, mainFirstOption, mainSecondOption, mainThirtyOption, mainQuarterOption, mainFifthOption, mainSixthOption, mainSeventhOption, mainEightOption)
+		kit.PrintOptions(welcomeMessage, mainFirstOption, mainSecondOption, mainThirtyOption, mainQuarterOption, mainFifthOption, mainSixthOption, mainSeventhOption)
 
 		optionSelected, err := kit.ScanOptionSelected()
 		if err != nil {
@@ -59,60 +75,126 @@ func executeMainOptions(app app.App) {
 func executeUseCases(optionSelected string, app app.App) bool {
 	switch optionSelected {
 	case "1":
-		return app.DatabaseService.Init() == nil
+		return app.DatabaseService.Create() == nil
 	case "2":
-		return app.PrimaryKeysService.Create() == nil
+		return app.DatabaseService.InsertData() == nil
 	case "3":
-		return app.PrimaryKeysService.Delete() == nil
+		return showPrimaryKeys(app) == nil
 	case "4":
-		return app.ForeignKeysService.Create() == nil
+		return showForeignKeys(app) == nil
 	case "5":
-		return app.PrimaryKeysService.Delete() == nil
-	case "6":
-		return app.DatabaseService.SyncBetweenSQLAndNoSQL() == nil
-	case "7":
-		return app.DatabaseService.ViewNoSQL() == nil
-	case "8":
 		return showStoredProcedures(app) == nil
+	case "6":
+		return showTriggers(app) == nil
+	case "7":
+		return showNoSql(app) == nil
 	default:
 		return false
 	}
 }
 
-func showStoredProcedures(app app.App) error {
+func showPrimaryKeys(app app.App) error {
 	executing := true
 
 	for executing {
-		kit.PrintOptions(spMessage, spFirstOption, spSecondOption, spThirtyOption, spQuarterOption, spFifthOption, spSixthOption)
+		kit.PrintOptions(pkMessage, pkFirstOption, pkSecondOption)
 		option, err := kit.ScanOptionSelected()
 		if err != nil {
 			log.Fatalln(err)
 			return err
 		}
 
-		executing = executeStoredProcedures(option, app)
+		switch option {
+		case "1":
+			executing = app.PrimaryKeysService.Create() == nil
+		case "2":
+			executing = app.PrimaryKeysService.Delete() == nil
+		default:
+			executing = false
+		}
 	}
 
 	return nil
 }
 
-func executeStoredProcedures(optionSelected string, app app.App) bool {
-	switch optionSelected {
-	case "1":
-		return executeAppointmentGenerator(app) == nil
-	case "2":
-		return executeAppointmentAttender(app) == nil
-	case "3":
-		return executeAppointmentCanceller(app) == nil
-	case "4":
-		return executeAppointmentReserver(app) == nil
-	case "5":
-		return app.InsuranceService.GenerateSettlements() == nil
-	case "6":
-		return app.EmailService.SendAbsenseEmails() == nil
-	default:
-		return false
+func showForeignKeys(app app.App) error {
+	executing := true
+
+	for executing {
+		kit.PrintOptions(fkMessage, fkFirstOption, fkSecondOption)
+		option, err := kit.ScanOptionSelected()
+		if err != nil {
+			log.Fatalln(err)
+			return err
+		}
+
+		switch option {
+		case "1":
+			executing = app.ForeignKeysService.Create() == nil
+		case "2":
+			executing = app.ForeignKeysService.Delete() == nil
+		default:
+			executing = false
+		}
 	}
+
+	return nil
+}
+
+func showTriggers(app app.App) error {
+	executing := true
+
+	for executing {
+		kit.PrintOptions(tgMessage, triggerFirstOption)
+		option, err := kit.ScanOptionSelected()
+		if err != nil {
+			log.Fatalln(err)
+			return err
+		}
+
+		switch option {
+		case "1":
+			executing = app.TriggerService.Create() == nil
+		default:
+			executing = false
+		}
+	}
+
+	return nil
+}
+
+func showStoredProcedures(app app.App) error {
+	executing := true
+
+	for executing {
+		kit.PrintOptions(spMessage, spFirstOption, spSecondOption, spThirtyOption, spQuarterOption, spFifthOption, spSixthOption, spSeventhOption)
+		option, err := kit.ScanOptionSelected()
+		if err != nil {
+			log.Fatalln(err)
+			return err
+		}
+
+		switch option {
+		case "1":
+			executing = app.StoredProcedureService.Create() == nil
+		case "2":
+			executing = executeAppointmentGenerator(app) == nil
+		case "3":
+			executing = executeAppointmentAttender(app) == nil
+		case "4":
+			executing = executeAppointmentCanceller(app) == nil
+		case "5":
+			executing = executeAppointmentReserver(app) == nil
+		case "6":
+			executing = app.InsuranceService.GenerateSettlements() == nil
+		case "7":
+			executing = app.EmailService.SendAbsenseEmails() == nil
+		default:
+			executing = false
+		}
+	}
+
+	return nil
 }
 
 func executeAppointmentGenerator(app app.App) error {
@@ -203,4 +285,28 @@ func executeAppointmentCanceller(app app.App) error {
 	}
 
 	return app.Appointment.Cancel(dni, dateFrom, dateTo)
+}
+
+func showNoSql(app app.App) error {
+	executing := true
+
+	for executing {
+		kit.PrintOptions(noSqlMessage, noSqlFirstOption, noSqlSecondOption)
+		option, err := kit.ScanOptionSelected()
+		if err != nil {
+			log.Fatalln(err)
+			return err
+		}
+
+		switch option {
+		case "1":
+			executing = app.DatabaseService.SyncBetweenSQLAndNoSQL() == nil
+		case "2":
+			executing = app.DatabaseService.ViewNoSQL() == nil
+		default:
+			executing = false
+		}
+	}
+
+	return nil
 }

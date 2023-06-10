@@ -33,6 +33,35 @@ func NewService(db kit.Database) Service {
 	}
 }
 
+func (s Service) Create() error {
+	log.Println(initLogMessage)
+
+	err := kit.ExecuteScript(databaseScriptPath, s.db.Postgres())
+	if err != nil {
+		log.Fatalln(errorOccurredMessage, err)
+		return err
+	}
+
+	err = kit.ExecuteScript(schemaScriptPath, s.db.App())
+	if err != nil {
+		log.Fatalln(errorOccurredMessage, err)
+		return err
+	}
+
+	log.Println(finishLogMessage)
+	return nil
+}
+
+func (s Service) InsertData() error {
+	err := kit.ExecuteScripts(dataFolderPath, s.db.App())
+	if err != nil {
+		log.Fatalln(errorOccurredMessage, err)
+		return err
+	}
+
+	return nil
+}
+
 func (s Service) SyncBetweenSQLAndNoSQL() error {
 	tx, err := s.db.Bolt().Begin(true)
 	if err != nil {
@@ -218,55 +247,6 @@ func (s Service) syncInsurances(tx *bolt.Tx) error {
 			return err
 		}
 	}
-	return nil
-}
-
-func (s Service) Init() error {
-	log.Println(initLogMessage)
-
-	err := kit.ExecuteScript(databaseScriptPath, s.db.Postgres())
-	if err != nil {
-		log.Fatalln(errorOccurredMessage, err)
-		return err
-	}
-
-	err = kit.ExecuteScript(schemaScriptPath, s.db.App())
-	if err != nil {
-		log.Fatalln(errorOccurredMessage, err)
-		return err
-	}
-
-	err = kit.ExecuteScript(pkScriptPath, s.db.App())
-	if err != nil {
-		log.Fatalln(errorOccurredMessage, err)
-		return err
-	}
-
-	err = kit.ExecuteScript(fkScriptPath, s.db.App())
-	if err != nil {
-		log.Fatalln(errorOccurredMessage, err)
-		return err
-	}
-
-	err = kit.ExecuteFunctionsCreation(storedProceduresFolderPath, s.db.App())
-	if err != nil {
-		log.Fatalln(errorOccurredMessage, err)
-		return err
-	}
-
-	err = kit.ExecuteFunctionsCreation(triggersProceduresFolderPath, s.db.App())
-	if err != nil {
-		log.Fatalln(errorOccurredMessage, err)
-		return err
-	}
-
-	err = kit.ExecuteScripts(dataFolderPath, s.db.App())
-	if err != nil {
-		log.Fatalln(errorOccurredMessage, err)
-		return err
-	}
-
-	log.Println(finishLogMessage)
 	return nil
 }
 
