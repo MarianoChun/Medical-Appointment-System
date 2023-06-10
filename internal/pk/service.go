@@ -25,24 +25,31 @@ func NewService(db kit.Database) Service {
 	}
 }
 
-func (s Service) Create() {
+func (s Service) Create() error {
 	log.Println(creationMessage)
 
-	s.Delete()
+	err := s.Delete()
+	if err != nil {
+		return err
+	}
 
-	err := kit.ExecuteScript(pathToPkCreation, s.db.App())
+	err = kit.ExecuteScript(pathToPkCreation, s.db.App())
 	if err != nil {
 		log.Fatalln(creationErrorMessage, err)
-		return
+		return err
 	}
+
+	return nil
 }
 
-func (s Service) Delete() {
+func (s Service) Delete() error {
 	log.Println(deletionMessage)
 
 	err := kit.ExecuteScript(pathToPkDeletion, s.db.App())
 	if err != nil {
 		log.Fatalln(deletionErrorMessage, err)
-		return
+		return err
 	}
+
+	return nil
 }

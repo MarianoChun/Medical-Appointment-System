@@ -33,48 +33,50 @@ func NewService(db kit.Database) Service {
 	}
 }
 
-func (s Service) SyncBetweenSQLAndNoSQL() {
+func (s Service) SyncBetweenSQLAndNoSQL() error {
 	tx, err := s.db.Bolt().Begin(true)
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
 	err = s.syncPatients(tx)
 	if err != nil {
 		_ = tx.Rollback()
-		return
+		return err
 	}
 
 	err = s.syncMedics(tx)
 	if err != nil {
 		_ = tx.Rollback()
-		return
+		return err
 	}
 
 	err = s.syncConsultingRooms(tx)
 	if err != nil {
 		_ = tx.Rollback()
-		return
+		return err
 	}
 
 	err = s.syncInsurances(tx)
 	if err != nil {
 		_ = tx.Rollback()
-		return
+		return err
 	}
 
 	err = s.syncAppointments(tx)
 	if err != nil {
 		_ = tx.Rollback()
-		return
+		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		_ = tx.Rollback()
-		return
+		return err
 	}
+
+	return nil
 }
 
 func (s Service) syncAppointments(tx *bolt.Tx) error {
@@ -219,66 +221,77 @@ func (s Service) syncInsurances(tx *bolt.Tx) error {
 	return nil
 }
 
-func (s Service) Init() {
+func (s Service) Init() error {
 	log.Println(initLogMessage)
 
 	err := kit.ExecuteScript(databaseScriptPath, s.db.Postgres())
 	if err != nil {
 		log.Fatalln(errorOccurredMessage, err)
-		return
+		return err
 	}
 
 	err = kit.ExecuteScript(schemaScriptPath, s.db.App())
 	if err != nil {
 		log.Fatalln(errorOccurredMessage, err)
-		return
+		return err
 	}
 
 	err = kit.ExecuteScript(pkScriptPath, s.db.App())
 	if err != nil {
 		log.Fatalln(errorOccurredMessage, err)
-		return
+		return err
 	}
 
 	err = kit.ExecuteScript(fkScriptPath, s.db.App())
 	if err != nil {
 		log.Fatalln(errorOccurredMessage, err)
-		return
+		return err
 	}
 
 	err = kit.ExecuteFunctionsCreation(storedProceduresFolderPath, s.db.App())
 	if err != nil {
 		log.Fatalln(errorOccurredMessage, err)
-		return
+		return err
 	}
 
 	err = kit.ExecuteFunctionsCreation(triggersProceduresFolderPath, s.db.App())
 	if err != nil {
 		log.Fatalln(errorOccurredMessage, err)
-		return
+		return err
 	}
 
 	err = kit.ExecuteScripts(dataFolderPath, s.db.App())
 	if err != nil {
 		log.Fatalln(errorOccurredMessage, err)
-		return
+		return err
 	}
 
 	log.Println(finishLogMessage)
+	return nil
 }
 
-func (s Service) ViewNoSQL() {
+func (s Service) ViewNoSQL() error {
 	buckets := []string{"appointments", "consulting_rooms", "medics", "patients", "insurances"}
-	s.db.Bolt().View(func(tx *bolt.Tx) error {
+	err := s.db.Bolt().View(func(tx *bolt.Tx) error {
 		for i := 0; i < len(buckets); i++ {
 			bucket := tx.Bucket([]byte(buckets[i]))
 
-			bucket.ForEach(func(k, v []byte) error {
+			err := bucket.ForEach(func(k, v []byte) error {
 				log.Println(string(bucket.Get(k)))
 
 				return nil
 			})
+
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

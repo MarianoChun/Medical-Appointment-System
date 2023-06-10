@@ -59,35 +59,27 @@ func executeMainOptions(app app.App) {
 func executeUseCases(optionSelected string, app app.App) bool {
 	switch optionSelected {
 	case "1":
-		app.DatabaseService.Init()
-		return true
+		return app.DatabaseService.Init() == nil
 	case "2":
-		app.PrimaryKeysService.Create()
-		return true
+		return app.PrimaryKeysService.Create() == nil
 	case "3":
-		app.PrimaryKeysService.Delete()
-		return true
+		return app.PrimaryKeysService.Delete() == nil
 	case "4":
-		app.ForeignKeysService.Create()
-		return true
+		return app.ForeignKeysService.Create() == nil
 	case "5":
-		app.PrimaryKeysService.Delete()
-		return true
+		return app.PrimaryKeysService.Delete() == nil
 	case "6":
-		app.DatabaseService.SyncBetweenSQLAndNoSQL()
-		return true
+		return app.DatabaseService.SyncBetweenSQLAndNoSQL() == nil
 	case "7":
-		app.DatabaseService.ViewNoSQL()
-		return true
+		return app.DatabaseService.ViewNoSQL() == nil
 	case "8":
-		showStoredProcedures(app)
-		return true
+		return showStoredProcedures(app) == nil
 	default:
 		return false
 	}
 }
 
-func showStoredProcedures(app app.App) {
+func showStoredProcedures(app app.App) error {
 	executing := true
 
 	for executing {
@@ -95,132 +87,120 @@ func showStoredProcedures(app app.App) {
 		option, err := kit.ScanOptionSelected()
 		if err != nil {
 			log.Fatalln(err)
-			return
+			return err
 		}
 
 		executing = executeStoredProcedures(option, app)
 	}
+
+	return nil
 }
 
 func executeStoredProcedures(optionSelected string, app app.App) bool {
 	switch optionSelected {
 	case "1":
-		executeAppointmentGenerator(app)
-		return true
+		return executeAppointmentGenerator(app) == nil
 	case "2":
-		executeAppointmentAttender(app)
-		return true
+		return executeAppointmentAttender(app) == nil
 	case "3":
-		executeAppointmentCanceller(app)
-		return true
+		return executeAppointmentCanceller(app) == nil
 	case "4":
-		executeAppointmentReserver(app)
-		return true
+		return executeAppointmentReserver(app) == nil
 	case "5":
-		executeInsuranceSettlementGenerator(app)
-		return true
+		return app.InsuranceService.GenerateSettlements() == nil
 	case "6":
-		executeAnsenceEmailsSender(app)
-		return true
+		return app.EmailService.SendAbsenseEmails() == nil
 	default:
 		return false
 	}
 }
 
-func executeAnsenceEmailsSender(app app.App) {
-	app.EmailService.SendAbsenseEmails()
-}
-
-func executeAppointmentGenerator(app app.App) {
+func executeAppointmentGenerator(app app.App) error {
 	date, err := kit.ScanMonthAndYear()
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
-	app.Appointment.Generate(date.Year(), int(date.Month()))
+	return app.Appointment.Generate(date.Year(), int(date.Month()))
 }
 
-func executeAppointmentAttender(app app.App) {
+func executeAppointmentAttender(app app.App) error {
 	appointmentNumberStr, err := kit.ScanOptionSelectedWithMessage("Indique el nro de turno")
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
 	appointmentNumber, err := strconv.Atoi(appointmentNumberStr)
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
-	app.Appointment.Attend(appointmentNumber)
+	return app.Appointment.Attend(appointmentNumber)
 }
 
-func executeInsuranceSettlementGenerator(app app.App) {
-	app.InsuranceService.GenerateSettlements()
-}
-
-func executeAppointmentReserver(app app.App) {
+func executeAppointmentReserver(app app.App) error {
 	clinicHistoryNumberStr, err := kit.ScanOptionSelectedWithMessage("Indique el nro de historia clinica del paciente")
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
 	clinicHistoryNumber, err := strconv.Atoi(clinicHistoryNumberStr)
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
 	dniStr, err := kit.ScanOptionSelectedWithMessage("Indique el dni del medique")
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
 	dni, err := strconv.Atoi(dniStr)
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
 	date, err := kit.ScanDateAndHour()
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
-	app.Appointment.Reserve(clinicHistoryNumber, dni, date)
+	return app.Appointment.Reserve(clinicHistoryNumber, dni, date)
 }
 
-func executeAppointmentCanceller(app app.App) {
+func executeAppointmentCanceller(app app.App) error {
 	fmt.Println("A continuacion indicará la fecha desde")
 	dateFrom, err := kit.ScanDate()
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
 	fmt.Println("A continuacion indicará la fecha hasta")
 	dateTo, err := kit.ScanDate()
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
 	dniStr, err := kit.ScanOptionSelectedWithMessage("Indique el dni")
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
 	dni, err := strconv.Atoi(dniStr)
 	if err != nil {
 		log.Fatalln(err)
-		return
+		return err
 	}
 
-	app.Appointment.Cancel(dni, dateFrom, dateTo)
+	return app.Appointment.Cancel(dni, dateFrom, dateTo)
 }
