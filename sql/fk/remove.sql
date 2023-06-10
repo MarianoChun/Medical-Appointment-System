@@ -13,11 +13,6 @@ alter table turno drop constraint if exists nro_paciente_fk;
 -- reprogramacion
 alter table reprogramacion drop constraint if exists nro_turno_fk;
 
--- error
-alter table error drop constraint if exists nro_consultorio_fk;
-alter table error drop constraint if exists dni_medique_fk;
-alter table error drop constraint if exists nro_paciente_fk;
-
 -- cobertura
 alter table cobertura drop constraint if exists dni_medique_fk;
 alter table cobertura drop constraint if exists nro_obra_social_fk;
