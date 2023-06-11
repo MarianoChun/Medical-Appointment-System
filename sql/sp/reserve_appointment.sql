@@ -11,14 +11,14 @@ declare
 begin
     select * into result from medique where medique.dni_medique = dni_medique_reserva;
     if not found then
-        insert into error (f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?dni de médique no válido');
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?dni de médique no válido');
         raise notice 'No existe un medique con dicho dni, ingrese un dni existente';
         return false;
     end if;
 
     select * into result from paciente where paciente.nro_paciente = nro_historia_clinica;
     if not found then
-        insert into error (f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?nro de historia clínica no válido');
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?nro de historia clínica no válido');
         raise notice 'No existe un paciente con dicho nro de historia clinica, ingrese uno existente';
         return false;
     end if;
@@ -27,7 +27,7 @@ begin
     if nroObraSocialPaciente is not null then
         select * into result from cobertura where cobertura.dni_medique = dni_medique_reserva and cobertura.nro_obra_social = nroObraSocialPaciente;
         if not found then
-            insert into error (f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?obra social de paciente no atendida por le médique');
+            insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?obra social de paciente no atendida por le médique');
             raise notice 'La obra social del paciente no es atendida por le médique';
             return false;
         end if;
@@ -38,14 +38,14 @@ begin
 
     select * into turnoAReservar from turno where date_trunc('hour', turno.fecha) = timeStampTurnoSolicitado and turno.dni_medique = dni_medique_reserva and turno.estado = 'disponible' limit 1;
     if not found then
-        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?turno inexistente ó no disponible');
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?turno inexistente ó no disponible');
         raise notice 'El turno es inexistente ó no esta disponible';
         return false;
     end if;
 
     turnosReservadosPaciente := count_reserved_appointments_for_patient(nro_historia_clinica);
     if turnosReservadosPaciente = 5 then
-        insert into error(f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?supera límite de reserva de turnos');
+        insert into error(nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?supera límite de reserva de turnos');
         raise notice 'El turno a reservar supera el límite de reserva de turnos';
         return false;
     end if;
@@ -67,7 +67,7 @@ $$ language plpgsql;
 
 create or replace function create_reserve_appointment_error(fecha_turno timestamp, nro_consultorio_error integer, nro_historia_clinica integer, dni_medique_error integer, msg text) returns void as $$
 begin
-    insert into error (f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (fecha_turno, nro_consultorio_error, dni_medique_error, nro_historia_clinica, 'reserva', now(), msg);
+    insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, fecha_turno, nro_consultorio_error, dni_medique_error, nro_historia_clinica, 'reserva', now(), msg);
 end;
 $$ language plpgsql;
 
