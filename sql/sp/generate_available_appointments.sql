@@ -20,9 +20,6 @@ begin
                     ROLLBACK;
                 end if;
 
-                perform pg_sleep(.1);
-                raise notice 'turnos para %', current_day;
-
                 insert into turno (fecha, nro_consultorio, dni_medique, estado)
                 values (agenda_time, medic_agenda.nro_consultorio, medic.dni_medique, 'disponible');
             end loop;
