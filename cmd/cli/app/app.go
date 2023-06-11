@@ -46,3 +46,7 @@ func NewApp() (App, error) {
 func (s App) Close() {
 	s.database.Close()
 }
+
+func (s App) GetDb() kit.Database {
+	return s.database
+}

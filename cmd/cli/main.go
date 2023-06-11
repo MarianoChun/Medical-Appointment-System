@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/cmd/cli/app"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal"
 	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 	"log"
 	"strconv"
+	"time"
 )
 
 const (
@@ -224,37 +226,34 @@ func executeAppointmentAttender(app app.App) error {
 }
 
 func executeAppointmentReserver(app app.App) error {
-	clinicHistoryNumberStr, err := kit.ScanOptionSelectedWithMessage("Indique el nro de historia clinica del paciente")
+	appointmentRequests, err := kit.QueryRowsFromTable("solicitud_reservas", app.GetDb().App())
+	defer appointmentRequests.Close()
 	if err != nil {
 		log.Fatalln(err)
 		return err
 	}
 
-	clinicHistoryNumber, err := strconv.Atoi(clinicHistoryNumberStr)
-	if err != nil {
-		log.Fatalln(err)
-		return err
-	}
+	for appointmentRequests.Next() {
 
-	dniStr, err := kit.ScanOptionSelectedWithMessage("Indique el dni del medique")
-	if err != nil {
-		log.Fatalln(err)
-		return err
-	}
+		var appointment internal.Appointment
+		var unusedColumn int
+		var reserveDate time.Time
+		var reserveHour time.Time
 
-	dni, err := strconv.Atoi(dniStr)
-	if err != nil {
-		log.Fatalln(err)
-		return err
-	}
+		if err := appointmentRequests.Scan(&unusedColumn, &appointment.PatientNumber, &appointment.MedicDni, &reserveDate, &reserveHour); err != nil {
+			log.Fatalln(err)
+			return err
+		}
 
-	date, err := kit.ScanDateAndHour()
-	if err != nil {
-		log.Fatalln(err)
-		return err
-	}
+		appointmentTimestamp := time.Date(reserveDate.Year(), reserveDate.Month(), reserveDate.Day(), reserveHour.Hour(), 0, 0, 0, time.UTC)
 
-	return app.Appointment.Reserve(clinicHistoryNumber, dni, date)
+		err := app.Appointment.Reserve(appointment.PatientNumber, appointment.MedicDni, appointmentTimestamp)
+		if err != nil {
+			log.Fatalln(err)
+			return err
+		}
+	}
+	return nil
 }
 
 func executeAppointmentCanceller(app app.App) error {

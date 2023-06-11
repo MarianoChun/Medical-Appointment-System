@@ -2,6 +2,7 @@ package kit
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	strings "strings"
 )
@@ -85,4 +86,16 @@ func ExecuteQuery(query string, db *sql.DB) error {
 	}
 
 	return nil
+}
+
+func QueryRowsFromTable(tableName string, db *sql.DB) (*sql.Rows, error) {
+	query := fmt.Sprintf("select * from solicitud_reservas;")
+	rows, err := db.Query(query)
+
+	if err != nil {
+		log.Fatalln(err)
+		return nil, err
+	}
+
+	return rows, nil
 }
