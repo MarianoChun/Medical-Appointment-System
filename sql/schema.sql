@@ -110,7 +110,7 @@ create table liquidacion_cabecera(
 drop table if exists liquidacion_detalle;
 create table liquidacion_detalle(
     nro_liquidacion int,
-    nro_linea int,
+    nro_linea serial,
     f_atencion date,
     nro_afiliade int,
     dni_paciente int,
