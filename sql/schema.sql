@@ -136,7 +136,7 @@ create table envio_email(
 
 drop table if exists solicitud_reservas;
 create table solicitud_reservas(
-    nro_orden int,
+    nro_orden serial,
     nro_paciente int,
     dni_medique int,
     fecha date,
