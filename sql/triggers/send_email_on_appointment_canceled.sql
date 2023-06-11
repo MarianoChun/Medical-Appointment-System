@@ -3,6 +3,7 @@ declare
     result record;
     email_title varchar := 'Cancelación de turno';
     email_body varchar;
+    email_status varchar := 'pendiente';
 begin
     if new.estado = old.estado then
         return new;
@@ -26,7 +27,7 @@ begin
 
     email_body := concat('¡Hola, ', result.nombre_paciente,'! Su turno con el medico ', result.nombre_medique, ' del día ', result.fecha_turno , ' ha sido cancelado. Pronto el centro de atención se contactará con usted.');
 
-    select send_email(result.email_paciente, email_title, email_body);
+    insert into envio_email(f_generacion, email_paciente, asunto, cuerpo, estado) values (now(), result.email_paciente, email_title, email_body, email_status);
 
     return new;
 end;

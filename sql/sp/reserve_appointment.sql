@@ -43,7 +43,8 @@ begin
         return false;
     end if;
 
-    turnosReservadosPaciente := count_reserved_appointments_for_patient(nro_historia_clinica);
+    select count(1) into turnosReservadosPaciente from turno where turno.nro_paciente = nro_historia_clinica and turno.estado = 'reservado';
+
     if turnosReservadosPaciente = 5 then
         insert into error(nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?supera límite de reserva de turnos');
         raise notice 'El turno a reservar supera el límite de reserva de turnos';
@@ -62,36 +63,5 @@ begin
                      estado = 'reservado', fecha = turnoAReservar.fecha where nro_turno = turnoAReservar.nro_turno;
 
     return true;
-end;
-$$ language plpgsql;
-
-create or replace function create_reserve_appointment_error(fecha_turno timestamp, nro_consultorio_error integer, nro_historia_clinica integer, dni_medique_error integer, msg text) returns void as $$
-begin
-    insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, fecha_turno, nro_consultorio_error, dni_medique_error, nro_historia_clinica, 'reserva', now(), msg);
-end;
-$$ language plpgsql;
-
-create or replace function count_reserved_appointments_for_patient(nro_paciente_consultado integer) returns integer as $$
-declare
-    appointmentCount integer;
-begin
-    select count(*) into appointmentCount from turno where turno.nro_paciente = nro_paciente_consultado and turno.estado = 'reservado';
-    return appointmentCount;
-end;
-$$ language plpgsql;
-
-create or replace function calculate_patient_amount(nro_paciente_consulta integer, dni_medique_consulta integer) returns decimal(12,2) as $$
-declare
-    nroObraSocialpaciente integer;
-    patientAmount decimal(12,2);
-begin
-    select nro_obra_social into nroObraSocialpaciente from paciente where paciente.nro_paciente = nro_paciente_consulta;
-    if nroObraSocialpaciente is null then
-        select monto_consulta_privada into patientAmount from medique where dni_medique = dni_medique_consulta;
-    else
-        select monto_paciente into patientAmount from cobertura where dni_medique = dni_medique_consulta and nro_obra_social = nroObraSocialpaciente;
-    end if;
-
-    return patientAmount;
 end;
 $$ language plpgsql;

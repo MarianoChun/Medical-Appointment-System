@@ -1,6 +1,5 @@
 create or replace function send_email_on_appointment_reservation() returns trigger as $$
 declare
-    emailIndex int;
     patient record;
     medic record;
     title text := 'Reserva de turno';
@@ -20,8 +19,7 @@ begin
 
     select format('Turno reservado para el paciente %s, %s en la fecha de %s a las %s en el consultorio numero %s con el medico %s, %s', patient.apellido, patient.nombre, new.fecha::date, new.fecha::time, new.nro_consultorio, medic.apellido, medic.nombre) into body;
 
-    insert into envio_email (f_generacion, email_paciente, asunto, cuerpo, estado)
-    values (now(), patient.email, title, body, estado);
+    insert into envio_email (f_generacion, email_paciente, asunto, cuerpo, estado) values (now(), patient.email, title, body, estado);
 
     return new;
 end;
