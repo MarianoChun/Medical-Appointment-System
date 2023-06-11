@@ -23,3 +23,5 @@ insert into medique (dni_medique, nombre, apellido, especialidad, monto_consulta
 insert into medique (dni_medique, nombre, apellido, especialidad, monto_consulta_privada, telefono) values (34765129, 'Patin', 'Catlow', 'Cardiologuía', 722424.44, '9111988-5577');
 insert into medique (dni_medique, nombre, apellido, especialidad, monto_consulta_privada, telefono) values (40271684, 'Gerard', 'Chinery', 'Ginecología', 956770.92, '9111466-9977');
 insert into medique (dni_medique, nombre, apellido, especialidad, monto_consulta_privada, telefono) values (25648973, 'Taddeo', 'Swanton', 'Osteopatía', 3404579.69, '9111665-8899');
+-- Medico todos los dias
+insert into medique (dni_medique, nombre, apellido, especialidad, monto_consulta_privada, telefono) values (12341234, 'Cansadoes', 'toy', 'Clínico', 88884444.44, '9111324-2109');
