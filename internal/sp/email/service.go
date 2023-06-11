@@ -26,3 +26,15 @@ func (s Service) SendAbsenseEmails() error {
 
 	return nil
 }
+
+func (s Service) SendReminderEmails() error {
+	query := "select send_reminder_on_appointment_reserved();"
+
+	err := kit.ExecuteQuery(query, s.db.App())
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	return nil
+}
