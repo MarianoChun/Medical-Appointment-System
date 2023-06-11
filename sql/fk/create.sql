@@ -22,5 +22,3 @@ alter table if exists liquidacion_cabecera add constraint nro_obra_social_fk for
 
 -- liquidacion_detalle
 alter table if exists liquidacion_detalle add constraint nro_liquidacion_fk foreign key (nro_liquidacion) references liquidacion_cabecera (nro_liquidacion);
-
--- Queda pendiente agregar las fks restantes para liquidacion_detalle. A que tablas referenciamos?

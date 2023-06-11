@@ -15,7 +15,9 @@ insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, d
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (43961825, 5, 5, '17:00:00', '18:00:00', '1h 0m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (30874512, 1, 2, '12:50:00', '13:40:00', '0h 50m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (28319476, 2, 3, '17:00:00', '17:30:00', '0h 30m 0s');
-
+insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (41244925, 2, 2, '12:00:00', '13:00:00', '1h 0m 0s');
+insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (20253212, 3, 1, '12:10:00', '13:00:00', '0h 50m 0s');
+insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (31219475, 4, 4, '12:00:00', '12:30:00', '0h 30m 0s');
 -- Medicos que atienden
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (34765129, 1, 5, '15:00:00', '16:00:00', '1h 00m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (34765129, 5, 2, '15:25:00', '15:50:00', '0h 25m 0s');
