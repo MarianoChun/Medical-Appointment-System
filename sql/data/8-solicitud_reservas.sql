@@ -1,28 +1,6 @@
 -- Turnos reservados correctamente
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (1, 38692417, '2023-01-04', '11:00:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (1, 38692417, '2023-01-25', '11:00:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (1, 38692417, '2023-01-25', '11:40:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (1, 38692417, '2023-01-18', '11:00:00');
-
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (2, 24587963, '2023-01-03', '14:00:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (2, 24587963, '2023-01-03', '14:20:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (2, 24587963, '2023-01-10', '14:00:00');
-
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (3, 28319476, '2023-01-03', '17:00:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (3, 28319476, '2023-01-03', '17:30:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (3, 28319476, '2023-01-10', '17:00:00');
-
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (4, 37894125, '2023-01-02', '13:00:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (4, 37894125, '2023-01-02', '13:20:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (4, 37894125, '2023-01-09', '13:00:00');
-
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (5, 33964752, '2023-01-11', '12:00:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (5, 33964752, '2023-01-11', '12:40:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (5, 33964752, '2023-01-04', '12:00:00');
-
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (21, 41244925, '2023-01-03', '12:00:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (22, 41244925, '2023-01-03', '13:00:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (23, 41244925, now(), '12:00:00');
+insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (9, 12341234, now(), '12:30:00');
+insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (14, 12341234, now(), '13:00:00');
 -- Turnos reservados incorrectamente, generan error
 
 -- nro de paciente invalido (no existe)
