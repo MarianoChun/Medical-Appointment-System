@@ -27,7 +27,7 @@ insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, d
 
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (25648973, 2, 1, '11:00:00', '11:35:00', '0h 35m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (25648973, 4, 1, '14:00:00', '14:45:00', '0h 45m 0s');
--- Medico todos los dias
+-- Medic that attends every day
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (12341234, 1, 6, '09:00:00', '14:00:00', '0h 30m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (12341234, 2, 6, '09:00:00', '14:00:00', '0h 30m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (12341234, 3, 6, '09:00:00', '14:00:00', '0h 30m 0s');
