@@ -25,7 +25,5 @@ begin
         values (now(), result.email, email_title, email_body, now(), 'pendiente');
 
     end loop;
-
-
 end;
 $$ language plpgsql;

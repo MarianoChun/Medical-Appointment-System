@@ -1,42 +1,671 @@
-= Bases de Datos: Trabajo Práctico
-Agustín Lautaro Escobar <agustinesco@outlook.es>
+= Bases de Datos I: Trabajo Práctico
+Agustín Lautaro Escobar <agustinesco@outlook.es>; Francisco Ruiz <franciscoruizlezcano@gmail.com>; Mariano Chun <marianochun01@gmail.com> v1, {docdate}. Docentes Daniel Bertaccini y Hernán Rondelli
+:title-page:
+:numbered:
+:source-highlighter: coderay
+:tabsize: 4
 
 == Introducción
 
 == Descripción
+=== Objetivo
+El objetivo del proyecto es desarrollar un sistema de administración de turnos médicos que permita asignar turnos correctamente, mantener la información de los pacientes, registrar las atenciones realizadas, administrar las liquidaciones mensuales de los médicos y enviar notificaciones por correo electrónico a los pacientes en diferentes situaciones (reserva de turno, cancelación, recordatorio, pérdida de turno). Además, se requiere la creación de la base de datos relacional con tablas específicas y la implementación de stored procedures y triggers para la lógica del sistema. También se solicita la comparación del modelo relacional con un modelo NoSQL, utilizando la base de datos BoltDB y almacenando los datos en formato JSON. El proyecto deberá poder ejecutarse desde una aplicación CLI escrita en Go.
 
-1. Tuvimos dificultad en visualizar las relaciones entre las tablas, para solucionar esto usamos el DER 
-2. Nos encontramos problemas a la hora de generar data para popular las tablas de la base de datos para lo que recurrimos a la pagina https://www.mockaroo.com[Mockaroo] la cual nos permite generar n cantidad de filas para las tablas
-3. Al momento de reservar los turnos, nos encontramos con la dificultad de tener que matchear los timestamp que solicita el paciente con el que figura en el turno disponible. El problema
-era que al momento de hacer la comparación, el cliente solo pasa la fecha y hora del turno que quiere, pero no especifica minutos. Esto último si figura en los turnos generados, por lo que se dio uso
-de la funcion date_trunc('hour' [turnoASolicitar]) para extraer del timestamp del turno unicamente la fecha y la hora, dejando los minutos en cero. De esta forma, hacemos que coincida con el formato del timestamp solicitado por el paciente
-y que se efectue el sp de forma correcta.
-4. Tuvimos un problema a la hora de crear los SP para la generación de turnos disponibles y envio mail, en una primera iteracion intentamos usar el metodo max(id) para obtener el maximo id y despues sumarle 1, pero decidimos cambiar el enfoque y hacer los ids de las tablas necesarias a serial
- 
+=== Desiciones de diseño
+Debido a que eramos varios personas desarrollando al mismo tiempo, decidimos utilizar una división de tareas y estructura de proyecto. Gracias a ello logramos una mejor organización y comunicación entre los miembros del equipo. Por otra parte, gracias a la lectura del contenido de archivos que nos provee el lenguaje, pudimos implementar toda la creación de bases de datos, datos, primary keys, foreign keys, stored procedures y trigerrs mediante archivos `.sql`. Esto nos permitió una mejor organización y mantenimiento de la base de datos.
+
+=== Problemas encontrados
+Durante el desarrollo del proyecto nos encontramos con varios problemas:
+
+1. Para contextualizar el dominio del problema que presenta el proyecto, tuvimos que realizar mediante el Modelo Relacional.
+
+2. Con el fin de popular las tablas de la base de datos, tuvimos que utlizar la herramienta https://www.mockaroo.com/[mockaroo] para generar datos aleatorios.
+
+3. Durante el proceso de reserva de turnos, nos enfrentamos a la dificultad de sincronizar los registros de tiempo solicitados por el paciente con los turnos disponibles. El desafío radicaba en que, al realizar la comparación, el cliente proporcionaba únicamente la fecha y hora del turno deseado, sin especificar los minutos. Sin embargo, esta información estaba presente en los turnos generados. Para solucionar este problema, utilizamos la función `date_trunc('hour', [turnoSolicitado])` para extraer únicamente la fecha y la hora del registro de tiempo del turno, estableciendo los minutos en cero. De esta manera, logramos que coincida con el formato del registro de tiempo solicitado por el paciente y se ejecute correctamente el procedimiento almacenado.
+
+4. Encontramos un desafío al desarrollar los procedimientos almacenados para la generación de turnos disponibles y el envío de correos electrónicos. En una primera iteración, intentamos utilizar el método max(id) para obtener el valor máximo del identificador y luego sumarle 1. Sin embargo, decidimos cambiar nuestra aproximación y optamos por utilizar el tipo de datos serial para los identificadores de las tablas pertinentes.
+
+5. Para inicializar la creación de la base de datos y su esquema pertinente, tuvimos que realizar dos conexiones a PostreSQL. La primera conexión se utilizó para crear la base de datos y la segunda para crear el esquema. Esto se debió a que en una misma conexión no encontramos la posibilidad de cambiar de esquema.
+
 == Implementación
 
-.Creación de la db y los schemas
-[source, sql]
+=== Estructura del proyecto
+La estructuración del proyecto la consideramos esencial para organizar, planificar y desarrollar eficientemente la aplicación. Nos proporciona claridad, mejora la colaboración y la comunicación entre los miembros del equipo.
+
+A continuación se muestra la estructura del proyecto:
+[source, bash]
 ----
-include::sql/schema.sql[]
+.
+├── cmd
+│   └── cli
+├── internal
+│   ├── db
+│   ├── fk
+│   ├── pk
+│   ├── fk
+│   ├── sp
+│   ├── trigger
+│   ├── appointment.go
+│   ├── consultingroom.go
+│   ├── insurance.go
+│   └── patient.go
+├── kit
+├── nosql
+├── sql
+│   ├── data
+│   ├── fk
+│   ├── pk
+│   ├── sp
+│   ├── triggers
+│   ├── schema.sql
+│   └── database.sql
+├── go.mod
+└── go.sum
 ----
 
-.Creación de las primary keys
-[source, sql]
+`/cmd`: Contiene todos los puntos de entrada e interacciones con el usuario de nuestra aplicación.
+
+`/internal`: Contiene todos los componentes que consideramos core de nuestra aplicación.
+
+`/kit`: Se encuentran funciones útiles que utilizamos en cualquier parte de la aplicación.
+
+`/nosql`: Contiene los archivos necesarios para la gestión de la base de datos no relacional.
+
+`/sql`: Contiene los archivos `.sql` necesarios para la creación de la base de datos, datos pre insertados, primary key, foreign key, stored procedures y triggers.
+
+==== Comandos
+Para ejecutar la aplicación CLI, se debe ejecutar el siguiente comando: `go run cmd/cli/main.go`
+
+=== Diagrama del Modelo Relacional
+.Diagrama del Modelo Relacional
+image::docs/images/diagram.png[]
+
+=== Scripts
+==== Creación de la base de datos y tablas
+.Creación de la base de datos, ubicado en `sql/database.sql`
+[source, postgresql]
 ----
-include::sql/create.sql[]
+drop database if exists consultorio;
+create database consultorio;
 ----
 
-.Eliminacion de las primary keys
-[source, sql]
+.Creación del esquema de la base de datos, ubicado en `sql/schema.sql`
+[source, postgresql]
 ----
-include::sql/remove.sql[]
+drop table if exists paciente;
+create table paciente(
+    nro_paciente serial,
+    nombre text,
+    apellido text,
+    dni_paciente int,
+    f_nac date,
+    nro_obra_social int,
+    nro_afiliade int,
+    domicilio text,
+    telefono char(12),
+    email text
+);
+
+drop table if exists medique;
+create table medique(
+    dni_medique int,
+    nombre text,
+    apellido text,
+    especialidad varchar(64),
+    monto_consulta_privada decimal(12,2),
+    telefono char(12)
+);
+
+drop table if exists consultorio;
+create table consultorio(
+    nro_consultorio serial,
+    nombre text,
+    domicilio text,
+    codigo_postal char(8),
+    telefono char(12)
+);
+
+drop table if exists agenda;
+create table agenda(
+    dni_medique int,
+    dia int,
+    nro_consultorio int,
+    hora_desde time,
+    hora_hasta time,
+    duracion_turno interval
+);
+
+drop table if exists turno;
+create table turno(
+    nro_turno serial,
+    fecha timestamp,
+    nro_consultorio int,
+    dni_medique int,
+    nro_paciente int,
+    nro_obra_social_consulta int,
+    nro_afiliade_consulta int,
+    monto_paciente decimal(12,2),
+    monto_obra_social decimal(12,2),
+    f_reserva timestamp,
+    estado char(10)
+);
+
+drop table if exists reprogramacion;
+create table reprogramacion(
+    nro_turno int,
+    nombre_paciente text,
+    apellido_paciente text,
+    telefono_paciente char(12),
+    email_paciente text,
+    nombre_medique text,
+    apellido_medique text,
+    estado char(12)
+);
+
+drop table if exists error;
+create table error(
+    nro_error serial,
+    f_turno timestamp,
+    nro_consultorio int,
+    dni_medique int,
+    nro_paciente int,
+    operacion char(12),
+    f_error timestamp,
+    motivo varchar(64)
+);
+
+drop table if exists cobertura;
+create table cobertura(
+    dni_medique int,
+    nro_obra_social int,
+    monto_paciente decimal(12,2),
+    monto_obra_social decimal(12,2)
+);
+
+drop table if exists obra_social;
+create table obra_social (
+    nro_obra_social serial,
+    nombre text,
+    contacto_nombre text,
+    contacto_apellido text,
+    contacto_telefono char(12),
+    contacto_email text
+);
+
+drop table if exists liquidacion_cabecera;
+create table liquidacion_cabecera(
+    nro_liquidacion serial,
+    nro_obra_social int,
+    desde date,
+    hasta date,
+    total decimal(15,2)
+);
+
+drop table if exists liquidacion_detalle;
+create table liquidacion_detalle(
+    nro_liquidacion int,
+    nro_linea serial,
+    f_atencion date,
+    nro_afiliade int,
+    dni_paciente int,
+    nombre_paciente text,
+    apellido_paciente text,
+    dni_medique int,
+    nombre_medique text,
+    apellido_medique text,
+    especialidad varchar(64),
+    monto decimal(12,2)
+);
+
+drop table if exists envio_email;
+create table envio_email(
+    nro_email serial,
+    f_generacion timestamp,
+    email_paciente text,
+    asunto text,
+    cuerpo text,
+    f_envio timestamp,
+    estado char(10)
+);
+
+drop table if exists solicitud_reservas;
+create table solicitud_reservas(
+    nro_orden int,
+    nro_paciente int,
+    dni_medique int,
+    fecha date,
+    hora time
+);
 ----
 
-.Insersion de Pacientes
-[source, sql]
+==== Primary Keys
+.Creación de las PKs, ubicado en `sql/pk/create.sql`
+[source, postgresql]
 ----
-include::sql/4-paciente.sql[]
+alter table paciente add constraint paciente_pk primary key (nro_paciente);
+alter table medique add constraint medique_pk primary key (dni_medique);
+alter table consultorio add constraint consultorio_pk primary key (nro_consultorio);
+alter table agenda add constraint agenda_pk primary key (dni_medique, dia);
+alter table turno add constraint turno_pk primary key (nro_turno);
+alter table reprogramacion add constraint reprogramacion_pk primary key (nro_turno);
+alter table error add constraint error_pk primary key (nro_error);
+alter table cobertura add constraint cobertura_pk primary key (dni_medique, nro_obra_social);
+alter table obra_social add constraint obra_social_pk primary key (nro_obra_social);
+alter table liquidacion_cabecera add constraint liquidacion_cabecera_pk primary key (nro_liquidacion);
+alter table liquidacion_detalle add constraint liquidacion_detalle_pk primary key (nro_liquidacion, nro_linea);
+alter table envio_email add constraint envio_email_pk primary key (nro_email);
 ----
 
+.Eliminación de las PKs, ubicado en `sql/pk/remove.sql`
+[source, postgresql]
+----
+alter table if exists paciente drop constraint if exists paciente_pk cascade;
+alter table if exists medique drop constraint if exists medique_pk cascade;
+alter table if exists consultorio drop constraint if exists consultorio_pk cascade;
+alter table if exists agenda drop constraint if exists agenda_pk cascade;
+alter table if exists turno drop constraint if exists turno_pk cascade;
+alter table if exists reprogramacion drop constraint if exists reprogramacion_pk cascade;
+alter table if exists error drop constraint if exists error_pk cascade;
+alter table if exists cobertura drop constraint if exists cobertura_pk cascade;
+alter table if exists obra_social drop constraint if exists obra_social_pk cascade;
+alter table if exists liquidacion_cabecera drop constraint if exists liquidacion_cabecera_pk cascade;
+alter table if exists liquidacion_detalle drop constraint if exists liquidacion_detalle_pk cascade;
+alter table if exists envio_email drop constraint if exists envio_email_pk cascade;
+----
+==== Foreign Keys
+.Creación de las FKs, ubicado en `sql/fk/create.sql`
+[source, postgresql]
+----
+-- paciente
+alter table if exists paciente add constraint nro_obra_social_fk foreign key (nro_obra_social) references obra_social (nro_obra_social);
+
+-- agenda
+alter table if exists agenda add constraint dni_medique_fk foreign key (dni_medique) references medique (dni_medique);
+alter table if exists agenda add constraint nro_consultorio_fk foreign key (nro_consultorio) references consultorio (nro_consultorio);
+
+-- turno
+alter table if exists turno add constraint nro_consultorio_fk foreign key (nro_consultorio) references consultorio (nro_consultorio);
+alter table if exists turno add constraint dni_medique_fk foreign key (dni_medique) references medique (dni_medique);
+alter table if exists turno add constraint nro_paciente_fk foreign key (nro_paciente) references paciente (nro_paciente);
+
+-- reprogramacion
+alter table if exists reprogramacion add constraint nro_turno_fk foreign key (nro_turno) references turno (nro_turno);
+
+-- cobertura
+alter table if exists cobertura add constraint dni_medique_fk foreign key (dni_medique) references medique (dni_medique);
+alter table if exists cobertura add constraint nro_obra_social_fk foreign key (nro_obra_social) references obra_social (nro_obra_social);
+
+-- liquidacion_cabecera
+alter table if exists liquidacion_cabecera add constraint nro_obra_social_fk foreign key (nro_obra_social) references obra_social (nro_obra_social);
+
+-- liquidacion_detalle
+alter table if exists liquidacion_detalle add constraint nro_liquidacion_fk foreign key (nro_liquidacion) references liquidacion_cabecera (nro_liquidacion);
+----
+
+.Eliminación de las FKs, ubicado en `sql/fk/remove.sql`
+[source, postgresql]
+----
+-- paciente
+alter table paciente drop constraint if exists nro_obra_social_fk;
+
+-- agenda
+alter table agenda drop constraint if exists dni_medique_fk;
+alter table agenda drop constraint if exists nro_consultorio_fk;
+
+-- turno
+alter table turno drop constraint if exists nro_consultorio_fk;
+alter table turno drop constraint if exists dni_medique_fk;
+alter table turno drop constraint if exists nro_paciente_fk;
+
+-- reprogramacion
+alter table reprogramacion drop constraint if exists nro_turno_fk;
+
+-- cobertura
+alter table cobertura drop constraint if exists dni_medique_fk;
+alter table cobertura drop constraint if exists nro_obra_social_fk;
+
+-- liquidacion_cabecera
+alter table liquidacion_cabecera drop constraint if exists nro_obra_social_fk;
+
+-- liquidacion_detalle
+alter table liquidacion_detalle drop constraint if exists nro_liquidacion_fk;
+----
+
+==== Stored Procedures
+.Atender turno, ubicado en `sql/sp/attend_appointment.sql`
+[source, postgresql]
+----
+create or replace function attend_appointment(appointment_number int) returns boolean as $$
+declare
+    appointment record;
+begin
+    select * from turno where nro_turno = appointment_number into appointment;
+    case
+        when not found then
+            insert into error(operacion, f_error, motivo) values ('atención', now(), '?nro de turno no válido.');
+            return false;
+        when appointment.fecha::date != now()::date then
+            insert into error(operacion, f_error, motivo) values ('atención', now(), '?turno no corresponde a la fecha del día.');
+            return false;
+        when appointment.estado != 'reservado' then
+            insert into error(operacion, f_error, motivo) values ('atención', now(), '?turno no reservado.');
+            return false;
+        else
+            update turno
+            set estado = 'atendido'
+            where nro_turno = appointment_number;
+            return true;
+    end case;
+end;
+$$ language plpgsql;
+----
+
+.Cancelar turno, ubicado en `sql/sp/cancel_appointment.sql`
+[source, postgresql]
+----
+create or replace function cancel_appointment(dni integer, date_from date, date_to date) returns int as $$
+declare
+    canceled_appointment_count int;
+    result record;
+begin
+    canceled_appointment_count := 0;
+
+    for result in select t.nro_turno as nro_turno, p.nro_paciente as nombre_paciente, p.apellido as apellido_paciente, p.telefono as telefono_paciente, p.email as email_paciente, m.nombre as nombre_medique, m.apellido as apellido_medique from turno t, paciente p, medique m where p.nro_paciente = t.nro_paciente and m.dni_medique = t.dni_medique and t.dni_medique = dni and t.estado in ('disponible', 'reservado') and t.fecha between date_from and date_to loop
+        update turno set estado = 'cancelado' where nro_turno = result.nro_turno;
+        insert into reprogramacion (nro_turno, nombre_paciente, apellido_paciente, telefono_paciente, email_paciente, nombre_medique, apellido_medique, estado) values (result.nro_turno, result.nombre_paciente, result.apellido_paciente, result.telefono_paciente, result.email_paciente, result.nombre_medique, result.apellido_medique, 'pendiente');
+        canceled_appointment_count := canceled_appointment_count + 1;
+    end loop;
+
+    return canceled_appointment_count;
+end;
+$$ language plpgsql;
+----
+
+.Crear turnos a partir de un año y mes, ubicado en `sql/sp/generate_available_appointment.sql`
+[source, postgresql]
+----
+create or replace function generate_appointments_in_month(year int, month int) returns boolean as $$
+declare
+    start_of_month timestamp;
+    end_of_month timestamp;
+    current_day date;
+    medic record;
+    any_appointment_in_range boolean;
+    medic_agenda record;
+    agenda_time timestamp;
+begin
+    start_of_month := make_timestamp(year, month, 1, 0, 0, 0);
+    end_of_month := start_of_month + interval '1 month - 1 day';
+
+    for current_day in select generate_series(start_of_month, end_of_month, interval '1 day') loop
+        for medic in select * from medique loop
+            select  * from agenda where dni_medique = medic.dni_medique and dia = date_part('dow', current_day) into medic_agenda;
+            for agenda_time in select generate_series(current_day + medic_agenda.hora_desde, current_day + medic_agenda.hora_hasta, medic_agenda.duracion_turno) loop
+                select exists(select 1 from turno  where fecha = agenda_time and dni_medique = medic.dni_medique) into any_appointment_in_range;
+                if any_appointment_in_range then
+                    ROLLBACK;
+                end if;
+
+                insert into turno (fecha, nro_consultorio, dni_medique, estado)
+                values (agenda_time, medic_agenda.nro_consultorio, medic.dni_medique, 'disponible');
+            end loop;
+        end loop;
+    end loop;
+    return true;
+exception
+  when others then
+    return false;
+end;
+$$ language plpgsql;
+----
+
+.Generar liquidaciones para las obras sociales, ubicado en `sql/sp/generate_insurance_settlements.sql`
+[source, postgresql]
+----
+create or replace function generate_insurance_settlements() returns void as $$
+declare
+    obraSocial record;
+    turnoRecord record;
+    fechaMesLiquidacionHasta date := now();
+    fechaMesLiquidacionDesde date := fechaMesLiquidacionHasta - interval '1 month';
+    montoObraSocial decimal (15, 2);
+    nroLiquidacionActual integer;
+    dniPacienteActual integer;
+    nombrePacienteActual text;
+    apellidoPacienteActual text;
+    nombreMediqueActual text;
+    apellidoMediqueActual text;
+    especialidadMediqueActual text;
+begin
+    for obraSocial in select * from obra_social loop
+        insert into liquidacion_cabecera (nro_liquidacion, nro_obra_social, desde, hasta, total) values (default, obraSocial.nro_obra_social, fechaMesLiquidacionDesde, fechaMesLiquidacionHasta, montoObraSocial);
+
+        montoObraSocial := 0.00;
+        select into nroLiquidacionActual nro_liquidacion from liquidacion_cabecera where nro_obra_social = obraSocial.nro_obra_social;
+
+        for turnoRecord in select * from turno where turno.nro_obra_social_consulta = obraSocial.nro_obra_social and  turno.estado = 'atendido' and turno.fecha between fechaMesLiquidacionDesde and fechaMesLiquidacionHasta loop
+                select dni_paciente, nombre, apellido into dniPacienteActual, nombrePacienteActual, apellidoPacienteActual from paciente where paciente.nro_paciente = turnoRecord.nro_paciente;
+                select nombre, apellido, especialidad into nombreMediqueActual, apellidoMediqueActual, especialidadMediqueActual from medique where dni_medique = turnoRecord.dni_medique;
+                insert into liquidacion_detalle (nro_linea, nro_liquidacion, f_atencion, nro_afiliade, dni_paciente, nombre_paciente, apellido_paciente, dni_medique, nombre_medique, apellido_medique, especialidad, monto) values (default, nroLiquidacionActual, turnoRecord.fecha, turnoRecord.nro_afiliade_consulta, dniPacienteActual, nombrePacienteActual, apellidoPacienteActual, turnoRecord.dni_medique, nombreMediqueActual, apellidoMediqueActual, especialidadMediqueActual, turnoRecord.monto_obra_social);
+
+                montoObraSocial := montoObraSocial + turnoRecord.monto_obra_social;
+                update turno set estado = 'liquidado' where nro_turno = turnoRecord.nro_turno;
+        end loop;
+
+        update liquidacion_cabecera set total = montoObraSocial where liquidacion_cabecera.nro_obra_social =  obraSocial.nro_obra_social;
+    end loop;
+end;
+$$ language plpgsql;
+----
+
+.Reserver turno, ubicado en `sql/sp/reserve_appointment.sql`
+[source, postgresql]
+----
+create or replace function reserve_appointment(nro_historia_clinica integer, dni_medique_reserva integer, fechaHora timestamp) returns boolean as $$
+declare
+    result record;
+    turnoAReservar record;
+    nroObraSocialPaciente integer;
+    nroAfiliadePaciente integer := null;
+    turnosReservadosPaciente integer;
+    montoPaciente decimal(12,2);
+    montoObraSocial decimal(12,2);
+    timeStampTurnoSolicitado timestamp := fechaHora;
+begin
+    select * into result from medique where medique.dni_medique = dni_medique_reserva;
+    if not found then
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?dni de médique no válido');
+        raise notice 'No existe un medique con dicho dni, ingrese un dni existente';
+        return false;
+    end if;
+
+    select * into result from paciente where paciente.nro_paciente = nro_historia_clinica;
+    if not found then
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?nro de historia clínica no válido');
+        raise notice 'No existe un paciente con dicho nro de historia clinica, ingrese uno existente';
+        return false;
+    end if;
+
+    select into nroObraSocialPaciente nro_obra_social from paciente where paciente.nro_paciente = nro_historia_clinica;
+    if nroObraSocialPaciente is not null then
+        select * into result from cobertura where cobertura.dni_medique = dni_medique_reserva and cobertura.nro_obra_social = nroObraSocialPaciente;
+        if not found then
+            insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?obra social de paciente no atendida por le médique');
+            raise notice 'La obra social del paciente no es atendida por le médique';
+            return false;
+        end if;
+
+        select into nroAfiliadePaciente nro_afiliade from paciente where paciente.nro_paciente = nro_historia_clinica;
+    end if;
+
+
+    select * into turnoAReservar from turno where date_trunc('hour', turno.fecha) = timeStampTurnoSolicitado and turno.dni_medique = dni_medique_reserva and turno.estado = 'disponible' limit 1;
+    if not found then
+        insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?turno inexistente ó no disponible');
+        raise notice 'El turno es inexistente ó no esta disponible';
+        return false;
+    end if;
+
+    select count(1) into turnosReservadosPaciente from turno where turno.nro_paciente = nro_historia_clinica and turno.estado = 'reservado';
+
+    if turnosReservadosPaciente = 5 then
+        insert into error(nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?supera límite de reserva de turnos');
+        raise notice 'El turno a reservar supera el límite de reserva de turnos';
+        return false;
+    end if;
+
+    if nroObraSocialpaciente is null then
+        select monto_consulta_privada into montoPaciente from medique where dni_medique = dni_medique_reserva;
+    else
+        select monto_paciente into montoPaciente from cobertura where dni_medique = dni_medique_reserva and nro_obra_social = nroObraSocialpaciente;
+        select monto_obra_social into montoObraSocial from cobertura where dni_medique = dni_medique_reserva and nro_obra_social = nroObraSocialpaciente;
+    end if;
+
+    update turno set nro_paciente = nro_historia_clinica, nro_obra_social_consulta = nroObraSocialPaciente,
+                     nro_afiliade_consulta = nroAfiliadePaciente, monto_paciente = montoPaciente, monto_obra_social = montoObraSocial, f_reserva = now(),
+                     estado = 'reservado', fecha = turnoAReservar.fecha where nro_turno = turnoAReservar.nro_turno;
+
+    return true;
+end;
+$$ language plpgsql;
+----
+
+.Enviar emails de turno olvidados, ubicado en `sql/sp/send_absence_emails.sql`
+[source, postgresql]
+----
+create or replace function send_absence_emails() returns void as $$
+declare
+    result record;
+    has_been_email_sended int;
+    email_body varchar;
+    email_status varchar := 'enviado';
+    email_title varchar := 'Turno cancelado';
+begin
+    for result in select t.nro_turno, concat(p.nombre, ' ', p.apellido) as nombre_paciente, p.email as email_paciente, concat(m.nombre, ' ', m.apellido) as nombre_medique, t.fecha as fecha_turno into result from turno t, paciente p, medique m where t.nro_paciente = p.nro_paciente and m.dni_medique = t.dni_medique and t.estado = 'reservado' and date(t.fecha) = date(now() - CAST('1 days' AS INTERVAL)) loop
+        email_body := concat('¡Hola, ', result.nombre_paciente,'! Su turno con el medico ', result.nombre_medique, ' del día ', result.fecha_turno , ' ha sido cancelado. Pronto el centro de atención se contactará con usted.');
+
+        select count(1) into has_been_email_sended
+        from envio_email e
+        where e.email_paciente = result.email_paciente
+        and e.asunto = email_title
+        and cuerpo = email_body;
+
+        if has_been_email_sended == 0 then
+            insert into envio_email (f_generacion, email_paciente, asunto, cuerpo, estado)
+            values (now(), result.email_paciente, email_title, email_body, email_status);
+        end if;
+    end loop;
+end;
+$$ language plpgsql;
+----
+
+.Enviar emails de recordatorios de turnos, ubicado en `sql/sp/send_reminder_email.sql`
+[source, postgresql]
+----
+create or replace function send_reminder_on_appointment_reserved() returns void as $$
+declare
+    turno turno%rowtype;
+    result record;
+    appointment_date_to_remind date := (current_date + interval '2 days')::date;
+    email_title text := 'Recordatorio de turno';
+    email_body text;
+begin
+    for turno in select * from turno where estado = 'reservado' and (fecha + interval '2 days')::date = appointment_date_to_remind loop
+        select
+            p.email,
+            concat(p.nombre,' ',p.apellido) as patient_full_name,
+            turno.monto_paciente,
+            turno.fecha,
+            c.nombre as consultory_room_name,
+            concat(m.nombre,' ',m.apellido) as medic_full_name
+            into result
+            from medique m, paciente p, consultorio c
+            where
+                turno.dni_medique = m.dni_medique and turno.nro_paciente = p.nro_paciente and turno.nro_consultorio = c.nro_consultorio;
+
+        email_body := concat('Estimado ', result.patient_full_name ,',le recordamos que tiene un turno para la fecha ', result.fecha, ' en el consultorio ', result.consultory_room_name,
+            ' con el doctor ', result.medic_full_name, '. Recuerde que el monto de la consulta es de ', result.monto_paciente);
+        insert into envio_email (f_generacion, email_paciente, asunto, cuerpo, f_envio, estado)
+        values (now(), result.email, email_title, email_body, now(), 'pendiente');
+
+    end loop;
+end;
+$$ language plpgsql;
+----
+
+==== Triggers
+.Enviar email de confirmación cuando el turno fue reservado, ubicado en `sql/triggers/send_confirmation_email_on_appointment_reserved.sql`
+[source, postgresql]
+----
+create or replace function send_email_on_appointment_reservation() returns trigger as $$
+declare
+    patient record;
+    medic record;
+    title text := 'Reserva de turno';
+    body text;
+    estado text := 'pendiente';
+begin
+    if new.estado = old.estado then
+        return new;
+    end if;
+
+    if new.estado != 'reservado' then
+        return new;
+    end if;
+
+    select * from paciente where nro_paciente = new.nro_paciente into patient;
+    select * from medique where dni_medique = new.dni_medique into medic;
+
+    select format('Turno reservado para el paciente %s, %s en la fecha de %s a las %s en el consultorio numero %s con el medico %s, %s', patient.apellido, patient.nombre, new.fecha::date, new.fecha::time, new.nro_consultorio, medic.apellido, medic.nombre) into body;
+
+    insert into envio_email (f_generacion, email_paciente, asunto, cuerpo, estado) values (now(), patient.email, title, body, estado);
+
+    return new;
+end;
+$$ language plpgsql;
+
+create or replace trigger send_email_on_appointment_reservated after update of estado on turno for each row execute procedure send_email_on_appointment_reservation();
+----
+
+.Enviar email cuando el turno fue cancelado, ubicado en `sql/triggers/send_email_on_appointment_canceled.sql`
+[source, postgresql]
+----
+create or replace function send_email_on_appointment_canceled() returns trigger as $$
+declare
+    result record;
+    email_title varchar := 'Cancelación de turno';
+    email_body varchar;
+    email_status varchar := 'pendiente';
+begin
+    if new.estado = old.estado then
+        return new;
+    end if;
+
+    if new.estado <> 'cancelado' then
+        return new;
+    end if;
+
+    select
+        t.nro_turno,
+        concat(p.nombre, ' ', p.apellido) as nombre_paciente,
+        p.email as email_paciente,
+        concat(m.nombre, ' ', m.apellido) as nombre_medique,
+        t.fecha as fecha_turno
+    into result
+    from turno t, paciente p, medique m
+    where t.nro_paciente = p.nro_paciente
+    and m.dni_medique = t.dni_medique
+    and t.nro_turno = old.nro_turno;
+
+    email_body := concat('¡Hola, ', result.nombre_paciente,'! Su turno con el medico ', result.nombre_medique, ' del día ', result.fecha_turno , ' ha sido cancelado. Pronto el centro de atención se contactará con usted.');
+
+    insert into envio_email(f_generacion, email_paciente, asunto, cuerpo, estado) values (now(), result.email_paciente, email_title, email_body, email_status);
+
+    return new;
+end;
+$$ language plpgsql;
+
+create trigger send_email_on_appointment_canceled after update on turno for each row execute procedure send_email_on_appointment_canceled();
+----
 == Conclusiones
+El trabajo práctico logró desarrollar un sistema de administración de turnos médicos que cumple con los objetivos establecidos. Se superaron los desafíos encontrados durante el proceso de desarrollo y se aplicaron soluciones efectivas. El trabajo en equipo y la utilización de herramientas adecuadas contribuyeron a la eficiencia y calidad del resultado final.
