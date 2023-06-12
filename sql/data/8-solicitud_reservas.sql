@@ -1,6 +1,6 @@
 -- Turnos reservados correctamente
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (9, 12341234, now(), '12:30:00');
-insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (14, 12341234, now(), '13:00:00');
+insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (9, 37894125, now(), '12:30:00');
+insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (14, 29784562, now(), '13:00:00');
 -- Turnos reservados incorrectamente, generan error
 
 -- nro de paciente invalido (no existe)
