@@ -1,0 +1,23 @@
+pdf:
+  image: ruby:latest
+  stage: deploy
+  script:
+    - gem install --pre asciidoctor-pdf
+    - gem install pygments.rb coderay
+    - asciidoctor-pdf README.adoc
+  artifacts:
+    paths:
+      - README.pdf
+  only:
+    - master
+
+pages:
+  stage: deploy
+  script:
+    - echo "nil"
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+    - main

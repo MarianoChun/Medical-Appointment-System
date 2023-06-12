@@ -6,10 +6,9 @@ Agustín Lautaro Escobar <agustinesco@outlook.es>; Francisco Ruiz <franciscoruiz
 :tabsize: 4
 
 == Introducción
+El objetivo del proyecto es desarrollar un sistema de administración de turnos médicos que permita asignar turnos correctamente, mantener la información de los pacientes, registrar las atenciones realizadas, administrar las liquidaciones mensuales de los médicos y enviar notificaciones por correo electrónico a los pacientes en diferentes situaciones (reserva de turno, cancelación, recordatorio, pérdida de turno). Además, se requiere la creación de la base de datos relacional con tablas específicas y la implementación de stored procedures y triggers para la lógica del sistema. También se solicita la comparación del modelo relacional con un modelo NoSQL, utilizando la base de datos BoltDB y almacenando los datos en formato JSON. El proyecto deberá poder ejecutarse desde una aplicación CLI escrita en Go.
 
 == Descripción
-=== Objetivo
-El objetivo del proyecto es desarrollar un sistema de administración de turnos médicos que permita asignar turnos correctamente, mantener la información de los pacientes, registrar las atenciones realizadas, administrar las liquidaciones mensuales de los médicos y enviar notificaciones por correo electrónico a los pacientes en diferentes situaciones (reserva de turno, cancelación, recordatorio, pérdida de turno). Además, se requiere la creación de la base de datos relacional con tablas específicas y la implementación de stored procedures y triggers para la lógica del sistema. También se solicita la comparación del modelo relacional con un modelo NoSQL, utilizando la base de datos BoltDB y almacenando los datos en formato JSON. El proyecto deberá poder ejecutarse desde una aplicación CLI escrita en Go.
 
 === Desiciones de diseño
 Debido a que eramos varios personas desarrollando al mismo tiempo, decidimos utilizar una división de tareas y estructura de proyecto. Gracias a ello logramos una mejor organización y comunicación entre los miembros del equipo. Por otra parte, gracias a la lectura del contenido de archivos que nos provee el lenguaje, pudimos implementar toda la creación de bases de datos, datos, primary keys, foreign keys, stored procedures y trigerrs mediante archivos `.sql`. Esto nos permitió una mejor organización y mantenimiento de la base de datos.
