@@ -16,8 +16,8 @@ Debido a que eramos varios personas desarrollando al mismo tiempo, decidimos uti
 === Problemas encontrados
 Durante el desarrollo del proyecto nos encontramos con varios problemas:
 
-1. Para contextualizar el dominio del problema que presenta el proyecto, tuvimos que realizar un diagrama de Entidad Relacion (DER), de tal forma de poder identificar mejor las
-relaciones entre las tablas y su cardinalidad.
+1. Para contextualizar mejor el dominio del problema que presenta el proyecto, realizamos un diagrama de Modelo Relacional, de tal forma de poder identificar correctamente las
+relaciones entre las tablas y tener una idea de su cardinalidad.
 
 2. Con el fin de popular las tablas de la base de datos, tuvimos que utlizar la herramienta https://www.mockaroo.com/[mockaroo] para generar datos aleatorios.
 
