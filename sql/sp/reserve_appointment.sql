@@ -36,7 +36,7 @@ begin
     end if;
 
 
-    select * into turnoAReservar from turno where date_trunc('hour', turno.fecha) = timeStampTurnoSolicitado and turno.dni_medique = dni_medique_reserva and turno.estado = 'disponible' limit 1;
+    select * into turnoAReservar from turno where turno.fecha = timeStampTurnoSolicitado and turno.dni_medique = dni_medique_reserva and turno.estado = 'disponible' limit 1;
     if not found then
         insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?turno inexistente ó no disponible');
         raise notice 'El turno es inexistente ó no esta disponible';
