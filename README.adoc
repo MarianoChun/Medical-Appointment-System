@@ -10,21 +10,20 @@ El objetivo del proyecto es desarrollar un sistema de administración de turnos 
 
 == Descripción
 
-=== Desiciones de diseño
-Debido a que eramos varios personas desarrollando al mismo tiempo, decidimos utilizar una división de tareas y estructura de proyecto. Gracias a ello logramos una mejor organización y comunicación entre los miembros del equipo. Por otra parte, gracias a la lectura del contenido de archivos que nos provee el lenguaje, pudimos implementar toda la creación de bases de datos, datos, primary keys, foreign keys, stored procedures y trigerrs mediante archivos `.sql`. Esto nos permitió una mejor organización y mantenimiento de la base de datos.
+=== Decisiones de diseño
+Debido a que eramos varios personas desarrollando al mismo tiempo, decidimos utilizar una división de tareas y estructura de proyecto. Gracias a ello logramos una mejor organización y comunicación entre los miembros del equipo. Por otra parte, gracias a la lectura del contenido de archivos que nos provee el lenguaje, pudimos implementar toda la creación de bases de datos, datos, primary keys, foreign keys, stored procedures y triggers mediante archivos `.sql`. Esto nos permitió una mejor organización y mantenimiento de la base de datos.
 
 === Problemas encontrados
 Durante el desarrollo del proyecto nos encontramos con varios problemas:
 
-1. Para contextualizar el dominio del problema que presenta el proyecto, tuvimos que realizar mediante el Modelo Relacional.
+1. Para contextualizar el dominio del problema que presenta el proyecto, tuvimos que realizar un diagrama de Entidad Relacion (DER), de tal forma de poder identificar mejor las
+relaciones entre las tablas y su cardinalidad.
 
 2. Con el fin de popular las tablas de la base de datos, tuvimos que utlizar la herramienta https://www.mockaroo.com/[mockaroo] para generar datos aleatorios.
 
-3. Durante el proceso de reserva de turnos, nos enfrentamos a la dificultad de sincronizar los registros de tiempo solicitados por el paciente con los turnos disponibles. El desafío radicaba en que, al realizar la comparación, el cliente proporcionaba únicamente la fecha y hora del turno deseado, sin especificar los minutos. Sin embargo, esta información estaba presente en los turnos generados. Para solucionar este problema, utilizamos la función `date_trunc('hour', [turnoSolicitado])` para extraer únicamente la fecha y la hora del registro de tiempo del turno, estableciendo los minutos en cero. De esta manera, logramos que coincida con el formato del registro de tiempo solicitado por el paciente y se ejecute correctamente el procedimiento almacenado.
+3. Encontramos un desafío al desarrollar los procedimientos almacenados para la generación de turnos disponibles y el envío de correos electrónicos. En una primera iteración, intentamos utilizar el método max(id) para obtener el valor máximo del identificador y luego sumarle 1. Sin embargo, decidimos cambiar nuestra aproximación y optamos por utilizar el tipo de datos serial para los identificadores de las tablas pertinentes.
 
-4. Encontramos un desafío al desarrollar los procedimientos almacenados para la generación de turnos disponibles y el envío de correos electrónicos. En una primera iteración, intentamos utilizar el método max(id) para obtener el valor máximo del identificador y luego sumarle 1. Sin embargo, decidimos cambiar nuestra aproximación y optamos por utilizar el tipo de datos serial para los identificadores de las tablas pertinentes.
-
-5. Para inicializar la creación de la base de datos y su esquema pertinente, tuvimos que realizar dos conexiones a PostreSQL. La primera conexión se utilizó para crear la base de datos y la segunda para crear el esquema. Esto se debió a que en una misma conexión no encontramos la posibilidad de cambiar de esquema.
+4. Para inicializar la creación de la base de datos y su esquema pertinente, tuvimos que realizar dos conexiones a PostreSQL. La primera conexión se utilizó para crear la base de datos y la segunda para crear el esquema. Esto se debió a que en una misma conexión no encontramos la posibilidad de cambiar de esquema.
 
 == Implementación
 
@@ -667,4 +666,8 @@ $$ language plpgsql;
 create trigger send_email_on_appointment_canceled after update on turno for each row execute procedure send_email_on_appointment_canceled();
 ----
 == Conclusiones
-El trabajo práctico logró desarrollar un sistema de administración de turnos médicos que cumple con los objetivos establecidos. Se superaron los desafíos encontrados durante el proceso de desarrollo y se aplicaron soluciones efectivas. El trabajo en equipo y la utilización de herramientas adecuadas contribuyeron a la eficiencia y calidad del resultado final.
+El trabajo práctico logró desarrollar un sistema de administración de turnos médicos que cumple con los objetivos establecidos. Se superaron los desafíos encontrados durante el
+proceso de desarrollo y se aplicaron soluciones efectivas. El trabajo en equipo y la utilización de herramientas adecuadas contribuyeron a la eficiencia y
+calidad del resultado final. Además, el trabajo nos ayudó a comprender como podemos interactuar con la base de datos, no solo con las operaciones convencionales, sino
+que tambien con otros elementos como stored procedures, triggers y transactions. Por otra parte, tambien contribuyó a nuestro aprendizaje trabajar tantos con bases
+de datos sql y no sql, para tener una mayor noción de sus diferencias y la forma de trabajar cada una.
