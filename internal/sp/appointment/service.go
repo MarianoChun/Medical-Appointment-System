@@ -2,10 +2,11 @@ package appointment
 
 import (
 	"fmt"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 	"log"
 	"strconv"
 	"time"
+
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 type Service struct {
@@ -81,9 +82,9 @@ func (s Service) Reserve(clinicHistoryNumber, dniMedique int, date time.Time) er
 	}
 
 	if result {
-		fmt.Printf("Se ha reservado turno para la historia clinica %s y dniMedique %s \n", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dniMedique))
+		fmt.Printf("Se ha reservado turno para la historia clinica %s y dniMedique %s a las %s \n", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dniMedique), date)
 	} else {
-		fmt.Printf("No se ha reservado turno para la historia clinica %s y dniMedique %s \n", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dniMedique))
+		fmt.Printf("No se ha reservado turno para la historia clinica %s y dniMedique %s a las %s \n", strconv.Itoa(clinicHistoryNumber), strconv.Itoa(dniMedique), date)
 	}
 
 	return nil

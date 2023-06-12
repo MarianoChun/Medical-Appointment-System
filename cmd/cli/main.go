@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/cmd/cli/app"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal"
-	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 	"log"
 	"strconv"
 	"time"
+
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/cmd/cli/app"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/internal"
+	"gitlab.com/agustinesco/ruiz-escobar-mariano-tp/kit"
 )
 
 const (
@@ -229,7 +230,23 @@ func executeAppointmentAttender(app app.App) error {
 }
 
 func executeAppointmentReserver(app app.App) error {
-	appointmentRequests, err := kit.QueryRowsFromTable("solicitud_reservas", app.GetDb().App())
+	current_month := time.Now().Format("1")
+	current_year := time.Now().Format("2006")
+
+	_, err := app.GetDb().App().Exec("delete from turno;")
+	if err != nil {
+		log.Fatalln(err)
+		return err
+	}
+
+	query := fmt.Sprintf("select generate_appointments_in_month(%s, %s);", current_year, current_month)
+	_, err = app.GetDb().App().Exec(query)
+	if err != nil {
+		log.Fatalln(err)
+		return err
+	}
+
+	appointmentRequests, err := kit.QueryRowsFromTable("solicitud_reservas", "nro_orden", app.GetDb().App())
 	defer appointmentRequests.Close()
 	if err != nil {
 		log.Fatalln(err)
@@ -248,7 +265,7 @@ func executeAppointmentReserver(app app.App) error {
 			return err
 		}
 
-		appointmentTimestamp := time.Date(reserveDate.Year(), reserveDate.Month(), reserveDate.Day(), reserveHour.Hour(), 0, 0, 0, time.UTC)
+		appointmentTimestamp := time.Date(reserveDate.Year(), reserveDate.Month(), reserveDate.Day(), reserveHour.Hour(), reserveHour.Minute(), 0, 0, time.UTC)
 
 		err := app.Appointment.Reserve(appointment.PatientNumber, appointment.MedicDni, appointmentTimestamp)
 		if err != nil {

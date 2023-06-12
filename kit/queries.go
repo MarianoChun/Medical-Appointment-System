@@ -88,8 +88,8 @@ func ExecuteQuery(query string, db *sql.DB) error {
 	return nil
 }
 
-func QueryRowsFromTable(tableName string, db *sql.DB) (*sql.Rows, error) {
-	query := fmt.Sprintf("select * from solicitud_reservas;")
+func QueryRowsFromTable(tableName string, primaryKey string, db *sql.DB) (*sql.Rows, error) {
+	query := fmt.Sprintf("select * from %v order by %v;", tableName, primaryKey)
 	rows, err := db.Query(query)
 
 	if err != nil {
