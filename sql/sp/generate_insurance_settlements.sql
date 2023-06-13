@@ -3,19 +3,19 @@ declare
     obraSocial record;
     turnoRecord record;
     result record;
-    fechaMesLiquidacionHasta date := now();
+    fechaMesLiquidacionHasta date := current_date;
     fechaMesLiquidacionDesde date := fechaMesLiquidacionHasta - interval '1 month';
     montoObraSocial decimal (15, 2);
-
     nroLiquidacionActual integer;
 begin
     for obraSocial in select * from obra_social loop
+        montoObraSocial := 0.00;
+
         insert into liquidacion_cabecera (nro_liquidacion, nro_obra_social, desde, hasta, total) values (default, obraSocial.nro_obra_social, fechaMesLiquidacionDesde, fechaMesLiquidacionHasta, montoObraSocial);
 
-        montoObraSocial := 0.00;
         select into nroLiquidacionActual nro_liquidacion from liquidacion_cabecera where nro_obra_social = obraSocial.nro_obra_social;
 
-        for turnoRecord in select * from turno where turno.nro_obra_social_consulta = obraSocial.nro_obra_social and  turno.estado = 'atendido' and turno.fecha between fechaMesLiquidacionDesde and fechaMesLiquidacionHasta loop
+        for turnoRecord in select * from turno where turno.nro_obra_social_consulta = obraSocial.nro_obra_social and turno.estado = 'atendido' and date(turno.fecha) between fechaMesLiquidacionDesde and fechaMesLiquidacionHasta loop
                 select
                     p.dni_paciente,
                     p.nombre as nombre_paciente,
