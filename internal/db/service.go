@@ -42,7 +42,14 @@ func (s Service) Create() error {
 		return err
 	}
 
-	err = kit.ExecuteScript(schemaScriptPath, s.db.App())
+	log.Println(finishLogMessage)
+	return nil
+}
+
+func (s Service) CreateTables() error {
+	log.Println(initLogMessage)
+
+	err := kit.ExecuteScript(schemaScriptPath, s.db.App())
 	if err != nil {
 		log.Fatalln(errorOccurredMessage, err)
 		return err

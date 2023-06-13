@@ -13,19 +13,23 @@ import (
 
 const (
 	welcomeMessage = "  ____                      _ _             _           \n / ___|___  _ __  ___ _   _| | |_ ___  _ __(_) ___  ___ \n| |   / _ \\| '_ \\/ __| | | | | __/ _ \\| '__| |/ _ \\/ __|\n| |__| (_) | | | \\__ \\ |_| | | || (_) | |  | | (_) \\__ \\\n \\____\\___/|_| |_|___/\\__,_|_|\\__\\___/|_|  |_|\\___/|___/\n                                                        \n    _    ____  __  __ ___ _   _ \n   / \\  |  _ \\|  \\/  |_ _| \\ | |\n  / _ \\ | | | | |\\/| || ||  \\| |\n / ___ \\| |_| | |  | || || |\\  |\n/_/   \\_\\____/|_|  |_|___|_| \\_|\n                                \n"
+	dbMessage      = " ____   ___  _     \n/ ___| / _ \\| |    \n\\___ \\| | | | |    \n ___) | |_| | |___ \n|____/ \\__\\_\\_____|\n"
 	pkMessage      = " ____       _                              _  __              \n|  _ \\ _ __(_)_ __ ___   __ _ _ __ _   _  | |/ /___ _   _ ___ \n| |_) | '__| | '_ ` _ \\ / _` | '__| | | | | ' // _ \\ | | / __|\n|  __/| |  | | | | | | | (_| | |  | |_| | | . \\  __/ |_| \\__ \\\n|_|   |_|  |_|_| |_| |_|\\__,_|_|   \\__, | |_|\\_\\___|\\__, |___/\n                                   |___/            |___/   "
 	fkMessage      = " _____              _               _  __              \n|  ___|__  _ __ ___(_) __ _ _ __   | |/ /___ _   _ ___ \n| |_ / _ \\| '__/ _ \\ |/ _` | '_ \\  | ' // _ \\ | | / __|\n|  _| (_) | | |  __/ | (_| | | | | | . \\  __/ |_| \\__ \\\n|_|  \\___/|_|  \\___|_|\\__, |_| |_| |_|\\_\\___|\\__, |___/\n                      |___/                  |___/     \n"
 	tgMessage      = " _____     _                           \n|_   _| __(_) __ _  __ _  ___ _ __ ___ \n  | || '__| |/ _` |/ _` |/ _ \\ '__/ __|\n  | || |  | | (_| | (_| |  __/ |  \\__ \\\n  |_||_|  |_|\\__, |\\__, |\\___|_|  |___/\n             |___/ |___/               \n"
 	spMessage      = "     _                     _ \n ___| |_ ___  _ __ ___  __| |\n/ __| __/ _ \\| '__/ _ \\/ _` |\n\\__ \\ || (_) | | |  __/ (_| |\n|___/\\__\\___/|_|  \\___|\\__,_|\n                             \n                              _                     \n _ __  _ __ ___   ___ ___  __| |_   _ _ __ ___  ___ \n| '_ \\| '__/ _ \\ / __/ _ \\/ _` | | | | '__/ _ \\/ __|\n| |_) | | | (_) | (_|  __/ (_| | |_| | | |  __/\\__ \\\n| .__/|_|  \\___/ \\___\\___|\\__,_|\\__,_|_|  \\___||___/\n|_|                                                 \n"
 	noSqlMessage   = " _   _      ____   ___  _     \n| \\ | | ___/ ___| / _ \\| |    \n|  \\| |/ _ \\___ \\| | | | |    \n| |\\  | (_) |__) | |_| | |___ \n|_| \\_|\\___/____/ \\__\\_\\_____|\n                              \n"
 
-	mainFirstOption   = "1.  Crear Base de datos"
-	mainSecondOption  = "2.  Insertar datos"
-	mainThirtyOption  = "3.  Administración de Primary Keys"
-	mainQuarterOption = "4.  Administración de Foreign Keys"
-	mainFifthOption   = "5.  Administración de Stored Procedures"
-	mainSixthOption   = "6.  Administración Triggers"
-	mainSeventhOption = "7.  Administración de NoSQL"
+	mainFirstOption   = "1.  Administración Base de datos"
+	mainSecondOption  = "2.  Administración de Primary Keys"
+	mainThirtyOption  = "3.  Administración de Foreign Keys"
+	mainQuarterOption = "4.  Administración de Stored Procedures"
+	mainFifthOption   = "5.  Administración de Triggers"
+	mainSixthOption   = "6.  Administración de NoSQL"
+
+	dbFirstOption  = "1. Crear Base de datos"
+	dbSecondOption = "2. Crear Tablas"
+	dbThirdOption  = "3. Insertar data"
 
 	pkFirstOption  = "1. Crear Primary Keys"
 	pkSecondOption = "2. Eliminar Primary Keys"
@@ -59,7 +63,7 @@ func main() {
 
 func executeMainOptions(app app.App) {
 	for {
-		kit.PrintOptions(welcomeMessage, mainFirstOption, mainSecondOption, mainThirtyOption, mainQuarterOption, mainFifthOption, mainSixthOption, mainSeventhOption)
+		kit.PrintOptions(welcomeMessage, mainFirstOption, mainSecondOption, mainThirtyOption, mainQuarterOption, mainFifthOption, mainSixthOption)
 
 		optionSelected, err := kit.ScanOptionSelected()
 		if err != nil {
@@ -79,22 +83,46 @@ func executeMainOptions(app app.App) {
 func executeUseCases(optionSelected string, app app.App) bool {
 	switch optionSelected {
 	case "1":
-		return app.DatabaseService.Create() == nil
+		return showDatabase(app) == nil
 	case "2":
-		return app.DatabaseService.InsertData() == nil
-	case "3":
 		return showPrimaryKeys(app) == nil
-	case "4":
+	case "3":
 		return showForeignKeys(app) == nil
-	case "5":
+	case "4":
 		return showStoredProcedures(app) == nil
-	case "6":
+	case "5":
 		return showTriggers(app) == nil
-	case "7":
+	case "6":
 		return showNoSql(app) == nil
 	default:
 		return false
 	}
+}
+
+func showDatabase(app app.App) error {
+	executing := true
+
+	for executing {
+		kit.PrintOptions(dbMessage, dbFirstOption, dbSecondOption, dbThirdOption)
+		option, err := kit.ScanOptionSelected()
+		if err != nil {
+			log.Fatalln(err)
+			return err
+		}
+
+		switch option {
+		case "1":
+			executing = app.DatabaseService.Create() == nil
+		case "2":
+			executing = app.DatabaseService.CreateTables() == nil
+		case "3":
+			executing = app.DatabaseService.InsertData() == nil
+		default:
+			executing = false
+		}
+	}
+
+	return nil
 }
 
 func showPrimaryKeys(app app.App) error {
