@@ -1,3 +1,4 @@
+begin transaction;
 -- Turnos reservados correctamente
 insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (9, 26387951, now(), '12:30:00');
 insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (14, 26387951, now(), '13:00:00');
@@ -25,3 +26,4 @@ insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (
 insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (4, 12341234, now(), '11:00:00');
 insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (4, 12341234, now(), '11:30:00');
 insert into solicitud_reservas (nro_paciente, dni_medique, fecha, hora) values (4, 12341234, now(), '12:00:00');
+commit;

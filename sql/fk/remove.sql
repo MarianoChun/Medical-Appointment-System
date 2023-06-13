@@ -1,3 +1,4 @@
+begin transaction;
 -- paciente
 alter table paciente drop constraint if exists nro_obra_social_fk;
 
@@ -22,5 +23,4 @@ alter table liquidacion_cabecera drop constraint if exists nro_obra_social_fk;
 
 -- liquidacion_detalle
 alter table liquidacion_detalle drop constraint if exists nro_liquidacion_fk;
-
--- Queda pendiente agregar las fks restantes para liquidacion_detalle. A que tablas referenciamos?
+commit;

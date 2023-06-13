@@ -1,3 +1,4 @@
+begin transaction;
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (32145789, 4, 4444.12, 2222.40);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (24587963, 2, 71957.65, 53756.52);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (38692417, 1, 14135.81, 34241.4);
@@ -26,3 +27,4 @@ insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (25648973, 5, 36947.6, 16390.02);
 -- Medic that attends every day
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (12341234, 4, 42134.4, 32187.02);
+commit;

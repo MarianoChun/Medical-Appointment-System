@@ -1,3 +1,4 @@
+begin transaction;
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (32145789, 1, 1, '09:00:00', '14:00:00', '0h 30m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (24587963, 2, 2, '09:00:00', '14:00:00', '0h 30m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (38692417, 3, 3, '09:00:00', '14:00:00', '0h 30m 0s');
@@ -35,3 +36,4 @@ insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, d
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (12341234, 5, 6, '09:00:00', '14:00:00', '0h 30m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (12341234, 0, 6, '09:00:00', '14:00:00', '0h 30m 0s');
 insert into agenda (dni_medique, dia, nro_consultorio, hora_desde, hora_hasta, duracion_turno) values (12341234, 6, 6, '09:00:00', '14:00:00', '0h 30m 0s');
+commit;

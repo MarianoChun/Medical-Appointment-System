@@ -1,3 +1,4 @@
+begin transaction;
 drop table if exists paciente;
 create table paciente(
     nro_paciente serial,
@@ -142,3 +143,4 @@ create table solicitud_reservas(
     fecha date,
     hora time
 );
+commit;

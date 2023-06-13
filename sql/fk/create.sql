@@ -1,3 +1,4 @@
+begin transaction;
 -- paciente
 alter table if exists paciente add constraint nro_obra_social_fk foreign key (nro_obra_social) references obra_social (nro_obra_social);
 
@@ -22,3 +23,4 @@ alter table if exists liquidacion_cabecera add constraint nro_obra_social_fk for
 
 -- liquidacion_detalle
 alter table if exists liquidacion_detalle add constraint nro_liquidacion_fk foreign key (nro_liquidacion) references liquidacion_cabecera (nro_liquidacion);
+commit;

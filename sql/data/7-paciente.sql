@@ -1,3 +1,4 @@
+begin transaction;
 insert into paciente (nombre, apellido, dni_paciente, f_nac, nro_obra_social, nro_afiliade, domicilio, telefono, email) values ('Illa', 'Storrah', 19865504, '1901-12-05', 1, 74516901, 'Buell', '119054156502', 'istorrah0@yellowpages.com');
 insert into paciente (nombre, apellido, dni_paciente, f_nac, nro_obra_social, nro_afiliade, domicilio, telefono, email) values ('Delia', 'Soigoux', 25214666, '1909-11-06', 2, 58199898, 'Brentwood', '110136497493', 'dsoigoux1@un.org');
 insert into paciente (nombre, apellido, dni_paciente, f_nac, nro_obra_social, nro_afiliade, domicilio, telefono, email) values ('Anne', 'Hannon', 21354805, '1916-01-29', 3, 81358148, 'Clove', '114852426606', 'ahannon2@engadget.com');
@@ -22,3 +23,4 @@ insert into paciente (nombre, apellido, dni_paciente, f_nac, nro_obra_social, nr
 insert into paciente (nombre, apellido, dni_paciente, f_nac, nro_obra_social, nro_afiliade, domicilio, telefono, email) values ('Mariano', 'Perez', 19023512, '1920-11-22', 6, 16622256, 'Habana', '116374288262', 'marper@live.com');
 insert into paciente (nombre, apellido, dni_paciente, f_nac, nro_obra_social, nro_afiliade, domicilio, telefono, email) values ('Juan Roman', 'Riquelme', 37423184, '1978-06-24', 6, 12290937, 'Brandsen', '113492453868', 'romancabj@gmail.com');
 insert into paciente (nombre, apellido, dni_paciente, f_nac, nro_obra_social, nro_afiliade, domicilio, telefono, email) values ('Martin', 'Palermo', 45098381, '1997-03-26', 6, 15354223, 'Almirante Brown', '115547542965', 'titan@yahoo.com');
+commit;

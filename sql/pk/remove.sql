@@ -1,3 +1,4 @@
+begin transaction;
 alter table if exists paciente drop constraint if exists paciente_pk cascade;
 alter table if exists medique drop constraint if exists medique_pk cascade;
 alter table if exists consultorio drop constraint if exists consultorio_pk cascade;
@@ -10,3 +11,4 @@ alter table if exists obra_social drop constraint if exists obra_social_pk casca
 alter table if exists liquidacion_cabecera drop constraint if exists liquidacion_cabecera_pk cascade;
 alter table if exists liquidacion_detalle drop constraint if exists liquidacion_detalle_pk cascade;
 alter table if exists envio_email drop constraint if exists envio_email_pk cascade;
+commit;
