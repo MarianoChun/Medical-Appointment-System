@@ -25,6 +25,8 @@ relaciones entre las tablas y tener una idea de su cardinalidad.
 
 4. Para inicializar la creación de la base de datos y su esquema pertinente, tuvimos que realizar dos conexiones a PostreSQL. La primera conexión se utilizó para crear la base de datos y la segunda para crear el esquema. Esto se debió a que en una misma conexión no encontramos la posibilidad de cambiar de esquema.
 
+5. A la hora de leer los archivos `.sql`, tuvimos inconvenientes con la lectura de los caracteres especiales y comentarios. Para solucionar este problema, utilizamos las funciones utilitarias de `kit/queries.go` para sanitizar el contenido de los scripts.
+
 == Implementación
 
 === Estructura del proyecto
@@ -61,117 +63,121 @@ A continuación se muestra la estructura del proyecto:
 └── go.sum
 ----
 
-`/cmd`: Contiene todos los puntos de entrada e interacciones con el usuario de nuestra aplicación.
+===== `/cmd`
+Contiene todos los puntos de entrada e interacciones con el usuario de nuestra aplicación.
 
-`/internal`: Contiene todos los componentes que consideramos core de nuestra aplicación.
+===== `/internal`
+Contiene todos los componentes que consideramos core de nuestra aplicación.
 
-`/kit`: Se encuentran funciones útiles que utilizamos en cualquier parte de la aplicación.
+===== `/kit`:
+Se encuentran funciones útiles que utilizamos en cualquier parte de la aplicación.
 
-`/nosql`: Contiene los archivos necesarios para la gestión de la base de datos no relacional.
+===== `/nosql`
+Contiene los archivos necesarios para la gestión de la base de datos no relacional.
 
-`/sql`: Contiene los archivos `.sql` necesarios para la creación de la base de datos, datos pre insertados, primary key, foreign key, stored procedures y triggers.
+===== `/sql`
+Contiene los archivos `.sql` necesarios para la creación de la base de datos, datos pre insertados, primary key, foreign key, stored procedures y triggers.
 
-==== Comandos
+===== Comandos
 Para ejecutar la aplicación CLI, se debe ejecutar el siguiente comando: `go run cmd/cli/main.go`
 
-=== Diagrama del Modelo Relacional
+=== SQL
+==== DDL
+===== Creación de la BDD y esquema
+* Script de creación de la BDD, ubicado en `sql/database.sql`
+
+* Script de creación del esquema de la BDD, ubicado en `sql/schema.sql`
+
+===== Primary Keys
+* Script de creación de las PKs, ubicado en `sql/pk/create.sql`
+
+* Script de eliminación de las PKs, ubicado en `sql/pk/remove.sql`
+
+===== Foreign Keys
+* Script de creación ubicado en `sql/fk/create.sql`
+
+* Script de eliminación ubicado en `sql/fk/remove.sql`
+
+==== DML
+===== Inserción de datos
+* Script de inserción de datos para las obras sociales ubicado en `sql/data/1-obra_social.sql`
+
+* Script de inserción de datos para los mediques ubicado en `sql/data/2-medique.sql`
+
+* Script de inserción de datos para las cobertura ubicado en `sql/data/3-cobertura.sql`
+
+* Script de inserción de datos para los consultorios ubicado en `sql/data/4-consultorio.sql`
+
+* Script de inserción de datos para las agendas ubicado en `sql/data/5-agendas.sql`
+
+* Script de inserción de datos para los pacientes ubicado en `sql/data/6-paciente.sql`
+
+* Script de inserción de datos para las solicitudes de reservas ubicado en `sql/data/6-solicitud_reservas.sql`
+
+==== Diagrama del modelo relacional
 .Diagrama del Modelo Relacional
 image::docs/images/diagram.png[]
 
-=== Scripts
-==== Creación de la base de datos y tablas
-.Creación de la base de datos, ubicado en `sql/database.sql`
-[source, postgresql]
-----
-include::sql/database.sql[]
-----
-
-.Creación del esquema de la base de datos, ubicado en `sql/schema.sql`
-[source, postgresql]
-----
-include::sql/schema.sql[]
-----
-
-==== Primary Keys
-.Creación de las PKs, ubicado en `sql/pk/create.sql`
-[source, postgresql]
-----
-include::sql/pk/create.sql[]
-----
-
-.Eliminación de las PKs, ubicado en `sql/pk/remove.sql`
-[source, postgresql]
-----
-include::sql/pk/remove.sql[]
-----
-==== Foreign Keys
-.Creación de las FKs, ubicado en `sql/fk/create.sql`
-[source, postgresql]
-----
-include::sql/fk/create.sql[]
-----
-
-.Eliminación de las FKs, ubicado en `sql/fk/remove.sql`
-[source, postgresql]
-----
-include::sql/fk/remove.sql[]
-----
+=== Transacciones
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ==== Stored Procedures
-.Atender turno, ubicado en `sql/sp/attend_appointment.sql`
-[source, postgresql]
-----
-include::sql/sp/attend_appointment.sql[]
-----
+===== Atender turno
+* *Ubicación*: `sql/sp/attend_appointment.sql`
+* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
-.Cancelar turno, ubicado en `sql/sp/cancel_appointment.sql`
-[source, postgresql]
-----
-include::sql/sp/cancel_appointment.sql[]
-----
+===== Cancelar turno
+* *Ubicación*: `sql/sp/cancel_appointment.sql`
+* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
-.Crear turnos a partir de un año y mes, ubicado en `sql/sp/generate_available_appointment.sql`
-[source, postgresql]
-----
-include::sql/sp/generate_available_appointments.sql[]
-----
+===== Crear turnos a partir de un año y mes
+* *Ubicación*: `sql/sp/generate_available_appointment.sql`
+* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
-.Generar liquidaciones para las obras sociales, ubicado en `sql/sp/generate_insurance_settlements.sql`
-[source, postgresql]
-----
-include::sql/sp/generate_insurance_settlements.sql[]
-----
+===== Generar liquidaciones para las obras sociales
+* *Ubicación*: `sql/sp/generate_insurance_settlements.sql`
+* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
-.Reserver turno, ubicado en `sql/sp/reserve_appointment.sql`
-[source, postgresql]
-----
-include::sql/sp/reserve_appointment.sql[]
-----
+===== Reservar turno
+* *Ubicación*: `sql/sp/reserve_appointment.sql`
+* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
-.Enviar emails de turno olvidados, ubicado en `sql/sp/send_absence_emails.sql`
-[source, postgresql]
-----
-include::sql/sp/send_absence_emails.sql[]
-----
+===== Enviar emails de turno olvidados
+* *Ubicación*: `sql/sp/send_reminder_email.sql`
+* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
-.Enviar emails de recordatorios de turnos, ubicado en `sql/sp/send_reminder_email.sql`
-[source, postgresql]
-----
-include::sql/sp/send_reminder_email_on_appointment_reserved.sql[]
-----
+===== Enviar emails de recordatorios de turnos
+* *Ubicación*: `sql/sp/send_reminder_email.sql`
+* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ==== Triggers
-.Enviar email de confirmación cuando el turno fue reservado, ubicado en `sql/triggers/send_confirmation_email_on_appointment_reserved.sql`
-[source, postgresql]
-----
-include::sql/triggers/send_confirmation_email_on_appointment_reserved.sql[]
-----
+===== Enviar email de confirmación cuando el turno fue reservado
+* *Ubicación*: `sql/triggers/send_confirmation_email_on_appointment_reserved.sql`
+* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
-.Enviar email cuando el turno fue cancelado, ubicado en `sql/triggers/send_email_on_appointment_canceled.sql`
-[source, postgresql]
-----
-include::sql/triggers/send_email_on_appointment_canceled.sql[]
-----
+===== Enviar email cuando el turno fue cancelado
+* *Ubicación*: `sql/triggers/send_email_on_appointment_canceled.sql`
+* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+
+=== NoSQL
+==== Descripción
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+
+==== Sincronización de NoSQL con SQL
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+
+==== Visualización de los datos en la BDD NoSQL
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+
 == Conclusiones
 El trabajo práctico logró desarrollar un sistema de administración de turnos médicos que cumple con los objetivos establecidos. Se superaron los desafíos encontrados durante el
 proceso de desarrollo y se aplicaron soluciones efectivas. El trabajo en equipo y la utilización de herramientas adecuadas contribuyeron a la eficiencia y
