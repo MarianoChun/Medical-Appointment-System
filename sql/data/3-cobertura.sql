@@ -20,11 +20,9 @@ insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (41244925, 6, 42265.89, 36753.02);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (20253212, 6, 32674.29, 40314.02);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (31219475, 6, 12620.75, 13289.02);
--- medics with multiples coverage
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (40271684, 4, 74805.3, 72455.77);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (40271684, 1, 97854.33, 95381.25);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (25648973, 4, 17558.8, 45408.05);
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (25648973, 5, 36947.6, 16390.02);
--- Medic that attends every day
 insert into cobertura (dni_medique, nro_obra_social, monto_paciente, monto_obra_social) values (12341234, 4, 42134.4, 32187.02);
 commit;
