@@ -135,7 +135,7 @@ con el objetivo de insertar mas adelante  dicha información en la tabla de repr
 Finalmente, incrementamos el contador que lleva el conteo de los turnos cancelados. Por último, al terminar la iteración de todos los turnos que satisfagan la condición, retornamos el contador.
 * *Isolation level utilizado*: Para este SP se optó utilizar el isolation level de 'Repeateable Read', ya que buscamos evitar que dos personas cancelen turnos al mismo tiempo. Esto va a provocar que una transacción que pretenda cancelar turnos cuando otra ya lo esta haciendo, quede bloqueada
 hasta que haya finalizado la ejecución de la primera transacción. Por otro lado, no se opto por el isolation level de 'serializable' ya que en este SP en particular no es crítico el orden en que se ejecutan las transacciones. En consecuencia, ganamos mayor concurrencia y menor overhead gracias a esta decisión.
-* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Aclaraciones y funciones utilizadas*: Este SP esta relacionado al trigger de "send_email_on_appointment_canceled" dado que cada vez que se hace un update sobre la tabla de turnos, el mismo se ejecuta  para buscar los turnos cancelados, y manda el aviso de cancelación del turno a cada paciente que haya tenido un turno reservado con el doctor afectado.
 
 ===== Generar turnos a partir de un año y mes
 * *Ubicación*: `sql/sp/generate_available_appointment.sql`
