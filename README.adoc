@@ -100,19 +100,19 @@ Para ejecutar la aplicación CLI, se debe ejecutar el siguiente comando: `go run
 
 ==== DML
 ===== Inserción de datos
-* Script de inserción de datos para las obras sociales ubicado en `sql/data/1-obra_social.sql`
+* Script para las obras sociales ubicado en `sql/data/1-obra_social.sql`
 
-* Script de inserción de datos para los mediques ubicado en `sql/data/2-medique.sql`
+* Script para los mediques ubicado en `sql/data/2-medique.sql`
 
-* Script de inserción de datos para las cobertura ubicado en `sql/data/3-cobertura.sql`
+* Script para las cobertura ubicado en `sql/data/3-cobertura.sql`
 
-* Script de inserción de datos para los consultorios ubicado en `sql/data/4-consultorio.sql`
+* Script para los consultorios ubicado en `sql/data/4-consultorio.sql`
 
-* Script de inserción de datos para las agendas ubicado en `sql/data/5-agendas.sql`
+* Script para las agendas ubicado en `sql/data/5-agendas.sql`
 
-* Script de inserción de datos para los pacientes ubicado en `sql/data/6-paciente.sql`
+* Script para los pacientes ubicado en `sql/data/6-paciente.sql`
 
-* Script de inserción de datos para las solicitudes de reservas ubicado en `sql/data/6-solicitud_reservas.sql`
+* Script para las solicitudes de reservas ubicado en `sql/data/6-solicitud_reservas.sql`
 
 ==== Diagrama del modelo relacional
 .Diagrama del Modelo Relacional
@@ -125,36 +125,43 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique 
 ===== Atender turno
 * *Ubicación*: `sql/sp/attend_appointment.sql`
 * *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 * *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ===== Cancelar turno
 * *Ubicación*: `sql/sp/cancel_appointment.sql`
 * *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 * *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ===== Crear turnos a partir de un año y mes
 * *Ubicación*: `sql/sp/generate_available_appointment.sql`
 * *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 * *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ===== Generar liquidaciones para las obras sociales
 * *Ubicación*: `sql/sp/generate_insurance_settlements.sql`
 * *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 * *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ===== Reservar turno
 * *Ubicación*: `sql/sp/reserve_appointment.sql`
 * *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 * *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ===== Enviar emails de turno olvidados
 * *Ubicación*: `sql/sp/send_reminder_email.sql`
 * *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 * *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ===== Enviar emails de recordatorios de turnos
 * *Ubicación*: `sql/sp/send_reminder_email.sql`
 * *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 * *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ==== Triggers
