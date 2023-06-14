@@ -270,10 +270,43 @@ Estas funciones son funciones integradas en PostgreSQL y se utilizan para realiz
 * *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ===== Enviar emails de recordatorios de turnos
-* *Ubicación*: `sql/sp/send_reminder_email.sql`
-* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Ubicación*: `sql/sp/send_reminder_email_on_appointment_reserved.sql`
+* *Descripción del proceso*:
+ En resumen, este Store Procedure verifica los turnos reservados dos días después de la fecha actual y envía un correo electrónico de recordatorio a los pacientes correspondientes, siempre y cuando no se haya enviado un correo electrónico de recordatorio previamente para el mismo turno.
+1. Primero, declaramos las siguientes variables:
+
+- turno: Es una variable del tipo turno%rowtype que se utiliza dentro del bucle FOR para almacenar temporalmente cada registro de la tabla turno. Estos registros se obtienen si cumplen las condiciones:
+** Que el turno obtenido tenga estado de 'reservado'
+** Que la fecha a asistir al turno sea dentro de dos dias.
+
+- `result`: Es una variable del tipo record que se utiliza para almacenar los resultados de una consulta que recupera información adicional del paciente, el medico y el consultorio relacionados con el turno a recordar.
+
+- `appointment_date_to_remind`: Es una variable de tipo date que almacena la fecha de recordatorio, calculada como la fecha actual más dos días. Se utiliza para comparar con las fechas de los turnos resrvados y determinar cuáles cumplen con la condición de recordatorio.
+
+- `email_title`: Es una variable de tipo text que almacena el título del correo electrónico que se enviará, que en este caso es "Recordatorio de turno".
+
+- `email_body`: Es una variable de tipo text que almacena el cuerpo del email que se enviará. Se construye concatenando diferentes valores obtenidos de la consulta almacenada en la variable result.
+
+- has_been_email_sent: Es una variable de tipo int que se utiliza para verificar si un email similar ya ha sido enviado. Se asigna el valor 0 inicialmente y se actualiza mediante una consulta que cuenta los registros en la tabla envio_email que coinciden con el email del paciente, el cuerpo y asunto del email de recordatorio.
+2. Dentro de un bucle FOR, se seleccionan los registros de la tabla turno que tienen un estado igual a 'reservado' y cuya fecha más dos días coincide con la fecha de recordatorio. Cada registro se asigna a la variable turno para su posterior procesamiento.
+
+3. Dentro de dicho bucle, se realiza una consulta que obtiene información adicional relacionada con el turno. Los resultados de la consulta se almacenan en la variable result.
+
+4. Se construye el email_body utilizando la información obtenida en el paso anterior, proporcionando detalles como el nombre del paciente, la fecha del turno, el consultorio y el médico correspondiente, así como el monto de la consulta.
+
+5. Se realiza otra consulta para verificar si ya se ha enviado un correo electrónico con la misma información. El resultado se almacena en la variable has_been_email_sent.
+
+6. Si no se ha enviado previamente un correo electrónico con la misma información (es decir, has_been_email_sent es igual a 0), se inserta un nuevo registro en la tabla envio_email. El registro contiene la fecha de generación del correo electrónico, la dirección de email del paciente, el asunto y el cuerpo del email, así como el estado del envío (que se establece como 'pendiente').
+
+7. El bucle continúa hasta que se hayan procesado todos los registros de turno que cumplen con las condiciones especificadas.
+
+8. Fin del SP
+* *Isolation level utilizado*: Para este SP, se utilizó el isolation level de `serializable` ya que nos importa que las transacciones que lo afecten, se ejecuten de manera secuencial, de tal forma de evitar el envío de un mismo mail más de una vez.
+* *Aclaraciones y funciones utilizadas*:
+
+- `concat()`: Es una función que se utiliza para concatenar cadenas de texto.
+
+- `interval`: Es una función utilizada para realizar operaciones con intervalos de tiempo. En el código, se utiliza para agregar un intervalo de tiempo de dos días a la fecha actual y obtener la fecha de recordatorio.
 
 ==== Triggers
 ===== Enviar email de confirmación cuando el turno fue reservado
@@ -321,13 +354,24 @@ Estas funciones son específicas de PostgreSQL y se utilizan dentro del trigger 
 
 === NoSQL
 ==== Descripción
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+Para poder comparar de forma más clara una base de datos NoSQL con una SQL, se encomendó  guardar los datos de pacientes, médiques, consultorios, obras sociales, y turnos
+(tres por cada médique) en una base de datos no relacional llamada BoltDB. La misma consta de Buckets, que son colecciones de pares key/value que nos van a permitir guardar por separado estos datos.
+Haciendo una analogía con SQL, los buckets serían nuestras tablas. A continuación, se explicará el proceso de sincronización realizado en Go.
 
 ==== Sincronización de NoSQL con SQL
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+La sincronización tiene como punto inicial a la función `SyncBetweenSQLAndNoSQL`, el mismo se encarga de iniciar una transacción en la base de datos BoltDB utilizando `s.db.Bolt().Begin(true)`. El parámetro true indica que la transacción es de escritura.
 
-==== Visualización de los datos en la BDD NoSQL
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+A continuación, se llama a diferentes funciones de sincronización, como `syncPatients`, `syncMedics`, `syncConsultingRooms`, `syncInsurances` y `syncAppointments`. Cada una de estas funciones se encarga de recuperar los datos solicitados en la consigna de la base de datos SQL y almacenarlos en la base de datos BoltDB.
+
+El procedimiento para cada una de las funciones es bastante similar, por mencionar una de ellas, en la función syncAppointments, se ejecuta una consulta SQL para recuperar los datos de los turnos de la base de datos SQL. Luego, se itera sobre los resultados de la consulta y se construye un objeto Appointment con los datos obtenidos. A continuación, se codifica el objeto por medio de un Marshal en formato JSON y se almacena en un bucket llamado "appointments" en la base de datos BoltDB.
+
+Este proceso se repite para las otras funciones de sincronización, donde se recuperan datos de diferentes tablas de la base de datos SQL y se almacenan en los buckets correspondientes.
+
+Si ocurre algún error durante la sincronización de cualquiera de las funciones, se realiza un rollback de la transacción y se devuelve el error.
+
+Si todas las funciones de sincronización se ejecutan correctamente, se realiza un commit de la transacción y se devuelve nil.
+
+Finalmente, si se desean visualizar los datos sincronizados, se debe ejecutar la función `ViewNoSQL` que imprime por consola todos los datos de todos los buckets almacenados en BoltDB.
 
 == Conclusiones
 El trabajo práctico logró desarrollar un sistema de administración de turnos médicos que cumple con los objetivos establecidos. Se superaron los desafíos encontrados durante el
