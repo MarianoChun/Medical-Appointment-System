@@ -18,7 +18,14 @@ func NewService(db kit.Database) Service {
 func (s Service) SendAbsenseEmails() error {
 	query := "select send_absence_emails();"
 
-	err := kit.ExecuteQuery(query, s.db.App())
+	// Con serializable nos aseguramos porque las transacciones se ejecutan secuencialmente y no enviaremos mail duplicados
+	_, err := s.db.App().Exec("set transaction isolation level serializable;")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	err = kit.ExecuteQuery(query, s.db.App())
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -30,7 +37,14 @@ func (s Service) SendAbsenseEmails() error {
 func (s Service) SendReminderEmails() error {
 	query := "select send_reminder_on_appointment_reserved();"
 
-	err := kit.ExecuteQuery(query, s.db.App())
+	// Con serializable nos aseguramos porque las transacciones se ejecutan secuencialmente y no enviaremos mail duplicados
+	_, err := s.db.App().Exec("set transaction isolation level serializable;")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	err = kit.ExecuteQuery(query, s.db.App())
 	if err != nil {
 		log.Fatal(err)
 		return err

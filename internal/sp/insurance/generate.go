@@ -18,7 +18,14 @@ func NewService(db kit.Database) Service {
 func (s Service) GenerateSettlements() error {
 	query := "select generate_insurance_settlements();"
 
-	err := kit.ExecuteQuery(query, s.db.App())
+	// Con serializable nos aseguramos que no se generen liquidaciones duplicadas ya que las transaccioens se ejecutan secuencialmente
+	_, err := s.db.App().Exec("set transaction isolation level serializable;")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	err = kit.ExecuteQuery(query, s.db.App())
 	if err != nil {
 		log.Fatal(err)
 		return err
