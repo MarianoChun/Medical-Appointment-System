@@ -119,14 +119,69 @@ Para ejecutar la aplicación CLI, se debe ejecutar el siguiente comando: `go run
 image::docs/images/diagram.png[]
 
 ==== Transacciones
+Durante el desarrollo del trabajo práctico, eramos conscientes que las transacciones eran fundamentales para garantizar la integridad y la consistencia de los datos, preveniniendo los conflictos de concurrencia y asegurar que los cambios realizados en la base de datos sean duraderos.
+
+Por esto último, consideramos pertienente ejecutar cada proceso importante que iteracciona con la base de datos dentro de una transacción.
+
+En contraparte, como indicamos en la sección de problemas encontrados, no pudimos indicar el isolation level dentro de cada stored procedure. Por lo que decidimos indicarlo al inicio de cada transacción mediante codigo. Por ejemplo:
+
+[source, go]
+----
+// Inicio de la transacción
+begin, err := s.db.App().Begin()
+if err != nil {
+	return err
+}
+
+// Indicamos el isolation level
+_, err = begin.Exec("set transaction isolation level serializable;")
+if err != nil {
+	log.Fatal(err)
+	// Rollback en caso de error
+	begin.Rollback()
+	return err
+}
+
+// Ejecutamos el statement o stored procedure
+_, err = begin.Exec(statement)
+if err != nil {
+	log.Fatal(err)
+	// Rollback en caso de error
+	begin.Rollback()
+	return err
+}
+
+// Commit de la transacción
+begin.Commit()
+----
 
 ==== Stored Procedures
 
 ===== Atender turno
 * *Ubicación*: `sql/sp/attend_appointment.sql`
-* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Descripción del proceso*: El procedimiento almacenado "attend_appointment" se encarga de atender una cita específica identificada por su número de turno. El proceso consta de los siguientes pasos:
+
+1. Seleccionar los datos del turno correspondiente al número de turno proporcionado.
+
+2. Verificar si se encontró un turno con el número proporcionado. Si no se encuentra, se registra un error indicando que el número de turno no es válido y se devuelve "false".
+
+3. Comprobar si la fecha del turno coincide con la fecha actual. Si no coinciden, se registra un error indicando que el turno no corresponde a la fecha del día y se devuelve "false".
+
+4. Verificar si el estado del turno es "reservado". Si no lo está, se registra un error indicando que el turno no está reservado y se devuelve "false".
+
+5. Si todas las verificaciones anteriores son exitosas, se actualiza el estado del turno a "atendido".
+
+6. Se devuelve "true" para indicar que el proceso de atención de la cita se ha completado con éxito.
+
+En resumen, este procedimiento almacenado garantiza que solo se puedan atender citas válidas y reservadas en la fecha actual. Si se cumplen todas las condiciones, el estado del turno se actualiza y se devuelve un valor booleano para indicar el éxito del proceso. En caso de que alguna condición no se cumpla, se registra un error correspondiente y se devuelve un valor booleano para indicar el fallo del proceso.
+
+* *Isolation level utilizado*: El isolation level utilizado es "repeatable read". Esto se debe a que el procedimiento almacenado debe garantizar que el turno seleccionado no cambie durante el proceso de atención. Por lo tanto, se utiliza este nivel de aislamiento para evitar que se produzcan lecturas sucias y no repetibles. Por ende, si se ejecuta otra transaccion que modifique la tabla de turnos, la otra transaccion se bloqueara hasta que se termine de ejecutar el procedimiento almacenado actual.
+
+* *Aclaraciones y funciones utilizadas*: En el código del procedimiento almacenado "attend_appointment" no se utilizan funciones específicas de PostgreSQL. Sin embargo, hay algunas funciones incorporadas que se mencionan en el código:
+
+1. `now()`: Esta función devuelve la fecha y hora actuales.
+
+2. `::date`: Es un operador de conversión que se utiliza para convertir un valor de tipo "timestamp" en un valor de tipo "date". En el código, se utiliza para convertir la fecha del turno y la fecha actual al tipo "date" y luego se comparan para verificar si coinciden.
 
 ===== Cancelar turno
 * *Ubicación*: `sql/sp/cancel_appointment.sql`
@@ -145,9 +200,62 @@ hasta que haya finalizado la ejecución de la primera transacción. Por otro lad
 
 ===== Generar liquidaciones para las obras sociales
 * *Ubicación*: `sql/sp/generate_insurance_settlements.sql`
-* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Descripción del proceso*: El código del procedimiento almacenado "generate_insurance_settlements" se encarga de generar liquidaciones de las obras sociales. A continuación, se describe su funcionalidad paso a paso:
+
+1. Se declaran las siguientes variables:
+- `obraSocial`: Variable de tipo `record` utilizada para almacenar los datos de una obra social específica.
+- `turnoRecord`: Variable de tipo `record` utilizada para almacenar los datos de un turno específico.
+- `result`: Variable de tipo `record` utilizada para almacenar los datos de resultados de consultas relacionadas a pacientes y médicos.
+- `fechaMesLiquidacionHasta`: Variable de tipo `date` que almacena la fecha actual.
+- `fechaMesLiquidacionDesde`: Variable de tipo `date` que almacena la fecha del mes anterior a la fecha actual.
+- `fechaUltimaLiquidacion`: Variable de tipo `date` que almacenará la fecha de la última liquidación generada.
+- `montoObraSocial`: Variable de tipo `decimal` utilizada para calcular el monto total de la liquidación de una obra social.
+- `nroLiquidacionActual`: Variable de tipo `integer` utilizada para almacenar el número de liquidación actual.
+
+2. Se verifica si existen registros en la tabla "liquidacion_cabecera". Si hay registros, se obtiene la fecha de la última liquidación generada y se compara con la fecha actual. Si ambas fechas coinciden en año y mes, no se realiza ninguna acción y se finaliza el procedimiento.
+
+3. Se inicia un bucle "for" que itera sobre las obras sociales existentes en la tabla "obra_social".
+
+4. Dentro del bucle, se inicializa el monto de la obra social en $0.
+
+5. Se realiza una inserción en la tabla "liquidacion_cabecera" con los datos correspondientes a la nueva liquidación generada, incluyendo el número de obra social, el rango de fechas de la liquidación y el monto inicialmente establecido como $0.
+
+6. Se obtiene el número de liquidación actual generado en el paso anterior.
+
+7. Se inicia otro bucle "for" que itera sobre los turnos que cumplen las siguientes condiciones:
+- El número de obra social del turno coincide con el número de obra social actual del bucle externo.
+- El estado del turno es "atendido".
+- La fecha del turno está dentro del rango de fechas de la liquidación.
+
+8. Dentro del segundo bucle, se realiza una consulta para obtener los datos del paciente y el médico relacionados con el turno actual. Los resultados se almacenan en la variable `result`.
+
+9. Se realiza una inserción en la tabla "liquidacion_detalle" con los datos correspondientes al turno actual y la liquidación actual. Se incluyen datos como la fecha de atención, número de afiliado, datos del paciente y médico, especialidad y monto correspondiente al seguro médico.
+
+10. Se actualiza el monto de la obra social incrementándolo con el monto del seguro médico del turno actual.
+
+11. Se actualiza el estado del turno a "liquidado".
+
+12. Una vez finalizado el bucle interno, se actualiza el campo "total" de la tabla "liquidacion_cabecera" con el monto total de la obra social correspondiente.
+
+13. Se repiten los pasos 4 a 12 para cada obra social existente en la base de datos.
+
+En resumen, este procedimiento almacenado genera liquidaciones para todas las obras sociales existentes. Recorre los turnos atendidos en un rango de fechas específico y calcula el monto total de la liquidación para cada obra social. Luego, actualiza las tablas "liquidacion_cabecera" y "liquidacion_detalle" con los datos correspondientes.
+
+* *Isolation level utilizado*: Utiliza el nivel de aislamiento "serializable" para aseguramos que no se generen liquidaciones duplicadas ya que las transaccioens se ejecutan secuencialmente, obtenemos un mayor control sobre la lectura de los datos y evitamos que se produzcan errores de concurrencia.
+
+* *Aclaraciones y funciones utilizadas*: El código del procedimiento almacenado "generate_insurance_settlements" utiliza las siguientes funciones específicas de PostgreSQL:
+
+1. `current_date`: Esta función devuelve la fecha actual.
+
+2. `interval`: Es un operador utilizado para calcular una diferencia de tiempo entre dos fechas. En el código, se utiliza para restar un mes a la fecha actual y obtener así la fecha correspondiente al mes anterior.
+
+3. `count()`: Es una función de agregación que cuenta el número de filas que cumplen cierta condición. En el código, se utiliza junto con la cláusula `if` para verificar si existen registros en la tabla "liquidacion_cabecera".
+
+4. `max()`: Esta función devuelve el valor máximo de una columna o expresión. En el código, se utiliza para obtener la fecha de la última liquidación generada.
+
+5. `extract()`: Esta función se utiliza para extraer componentes específicos (como el año o el mes) de una fecha. En el código, se utiliza para comparar los componentes de año y mes entre la fecha de la última liquidación y la fecha actual.
+
+Estas funciones son funciones integradas en PostgreSQL y se utilizan para realizar cálculos, obtener valores de fecha y tiempo, realizar agregaciones y extraer componentes de fecha en el código del procedimiento almacenado.
 
 ===== Reservar turno
 * *Ubicación*: `sql/sp/reserve_appointment.sql`
@@ -175,8 +283,41 @@ hasta que haya finalizado la ejecución de la primera transacción. Por otro lad
 
 ===== Enviar email cuando el turno fue cancelado
 * *Ubicación*: `sql/triggers/send_email_on_appointment_canceled.sql`
-* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Descripción del proceso*: El trigger "send_email_on_appointment_canceled" se activa después de que se realiza una actualización en la tabla "turno". Su objetivo es enviar un correo electrónico de notificación cuando se cancela un turno. A continuación, se describe su funcionalidad paso a paso:
+
+1. Se declaran las siguientes variables:
+   - `result`: Variable de tipo `record` utilizada para almacenar los datos resultantes de una consulta.
+   - `email_title`: Variable de tipo `varchar` que almacena el título del correo electrónico.
+   - `email_body`: Variable de tipo `varchar` que almacena el cuerpo del correo electrónico.
+   - `email_status`: Variable de tipo `varchar` que indica el estado del envío del correo electrónico, establecido como "pendiente".
+
+2. Se verifica si el estado nuevo del turno es igual al estado anterior. Si son iguales, significa que no hubo cambios en el estado y se devuelve el nuevo registro sin realizar ninguna acción adicional.
+
+3. Se verifica si el estado nuevo del turno es "cancelado". Si no lo es, significa que el turno no ha sido cancelado y se devuelve el nuevo registro sin realizar ninguna acción adicional.
+
+4. Se verifica si el estado anterior del turno era "disponible". Si es así, significa que el turno no estaba reservado y, por lo tanto, no se enviará ningún correo electrónico. Se devuelve el nuevo registro sin realizar ninguna acción adicional.
+
+5. Se realiza una consulta para obtener los datos relevantes del turno cancelado, incluyendo el número de turno, el nombre y el correo electrónico del paciente, el nombre del médico y la fecha del turno. Los resultados se almacenan en la variable `result`.
+
+6. Se construye el cuerpo del correo electrónico concatenando los mensajes relevantes con los datos obtenidos de la consulta.
+
+7. Se realiza una inserción en la tabla "envio_email" para almacenar los detalles del correo electrónico a enviar. Se registran la fecha de generación, el correo electrónico del paciente, el asunto del correo electrónico, el cuerpo del correo electrónico y el estado como "pendiente".
+
+8. Se devuelve el nuevo registro del turno.
+
+En resumen, este trigger se encarga de enviar un correo electrónico de notificación cuando se cancela un turno. Realiza una serie de verificaciones y consultas para obtener los datos relevantes y construir el contenido del correo electrónico. Luego, inserta un registro en la tabla "envio_email" y retorna el nuevo registro del turno.
+
+* *Aclaraciones y funciones utilizadas*: El trigger "send_email_on_appointment_canceled" utiliza las siguientes funciones específicas de PostgreSQL:
+
+1. `old`: Es una referencia a la versión anterior del registro afectado por la actualización en la tabla. En el código, se utiliza para acceder a los valores antiguos del estado del turno (`old.estado`).
+
+2. `new`: Es una referencia a la nueva versión del registro afectado por la actualización en la tabla. En el código, se utiliza para acceder a los valores nuevos del estado del turno (`new.estado`).
+
+3. `concat()`: Esta función se utiliza para concatenar cadenas de texto. En el código, se utiliza para construir el cuerpo del correo electrónico uniendo diferentes mensajes y datos.
+
+4. `now()`: Esta función devuelve la fecha y hora actuales.
+
+Estas funciones son específicas de PostgreSQL y se utilizan dentro del trigger para realizar operaciones como obtener los valores antiguos y nuevos de los registros, concatenar cadenas de texto y obtener la fecha y hora actual.
 
 === NoSQL
 ==== Descripción
