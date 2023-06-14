@@ -130,8 +130,11 @@ image::docs/images/diagram.png[]
 
 ===== Cancelar turno
 * *Ubicación*: `sql/sp/cancel_appointment.sql`
-* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Descripción del proceso*: El SP se basa en que por medio de un for query, recorremos los records resultantes de la union entre aquellos turnos con estado de 'disponible' y 'reservado'. Ademas, al mismo tiempo de obtener dichos turnos, dando uso de un producto cartesiano, filtramos los datos de pacientes y medicos que componen dicho turno,
+con el objetivo de insertar mas adelante  dicha información en la tabla de reprogramación. Luego, por cada turno que recorremos, cambiamos su estado a 'cancelado', y en caso de que el turno cancelado sea uno 'reservado', es decir, donde el nro_paciente no sea nulo,  lo insertamos en la tabla de reprogramación.
+Finalmente, incrementamos el contador que lleva el conteo de los turnos cancelados. Por último, al terminar la iteración de todos los turnos que satisfagan la condición, retornamos el contador.
+* *Isolation level utilizado*: Para este SP se optó utilizar el isolation level de 'Repeateable Read', ya que buscamos evitar que dos personas cancelen turnos al mismo tiempo. Esto va a provocar que una transacción que pretenda cancelar turnos cuando otra ya lo esta haciendo, quede bloqueada
+hasta que haya finalizado la ejecución de la primera transacción. Por otro lado, no se opto por el isolation level de 'serializable' ya que en este SP en particular no es crítico el orden en que se ejecutan las transacciones. En consecuencia, ganamos mayor concurrencia y menor overhead gracias a esta decisión.
 * *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
 
 ===== Generar turnos a partir de un año y mes
