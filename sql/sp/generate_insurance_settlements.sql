@@ -5,12 +5,19 @@ declare
     result record;
     fechaMesLiquidacionHasta date := current_date;
     fechaMesLiquidacionDesde date := fechaMesLiquidacionHasta - interval '1 month';
+    fechaUltimaLiquidacion date;
     montoObraSocial decimal (15, 2);
     nroLiquidacionActual integer;
 begin
+    if (select count(1) from liquidacion_cabecera) != 0 then
+        select max(hasta) into fechaUltimaLiquidacion from liquidacion_cabecera;
+        if extract('year' from fechaUltimaLiquidacion) = extract('year' from current_date) and extract('month' from fechaUltimaLiquidacion) = extract('month' from current_date) then
+            return;
+        end if;
+    end if;
+
     for obraSocial in select * from obra_social loop
         montoObraSocial := 0.00;
-
         insert into liquidacion_cabecera (nro_liquidacion, nro_obra_social, desde, hasta, total) values (default, obraSocial.nro_obra_social, fechaMesLiquidacionDesde, fechaMesLiquidacionHasta, montoObraSocial);
 
         select into nroLiquidacionActual nro_liquidacion from liquidacion_cabecera where nro_obra_social = obraSocial.nro_obra_social;
