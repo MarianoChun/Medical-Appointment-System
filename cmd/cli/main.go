@@ -215,7 +215,6 @@ func executeAppointmentReserver(app app.App) error {
 		}
 
 		appointmentTimestamp := time.Date(reserveDate.Year(), reserveDate.Month(), reserveDate.Day(), reserveHour.Hour(), reserveHour.Minute(), 0, 0, time.UTC)
-
 		err := app.Appointment.Reserve(appointment.PatientNumber, appointment.MedicDni, appointmentTimestamp)
 		if err != nil {
 			log.Fatalln(err)

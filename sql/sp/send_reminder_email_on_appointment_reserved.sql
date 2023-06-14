@@ -5,7 +5,7 @@ declare
     appointment_date_to_remind date := (current_date + interval '2 days')::date;
     email_title text := 'Recordatorio de turno';
     email_body text;
-    has_been_email_sent integer;
+    has_been_email_sent int := 0;
 begin
     for turno in select * from turno where estado = 'reservado' and (fecha + interval '2 days')::date = appointment_date_to_remind loop
         select
@@ -23,20 +23,17 @@ begin
         email_body := concat('Estimado ', result.patient_full_name ,',le recordamos que tiene un turno para la fecha ', result.fecha, ' en el consultorio ', result.consultory_room_name,
             ' con el doctor ', result.medic_full_name, '. Recuerde que el monto de la consulta es de ', result.monto_paciente);
 
-        select count(1) into has_been_email_sent
+        select count(1)
         from envio_email
         where cuerpo = email_body
         and email_paciente = result.email
-        and asunto = email_title;
+        and asunto = email_title
+        into has_been_email_sent;
 
-        if has_been_email_sent == 0 then
+        if has_been_email_sent = 0 then
             insert into envio_email (f_generacion, email_paciente, asunto, cuerpo, f_envio, estado)
             values (now(), result.email, email_title, email_body, now(), 'pendiente');
-        else
-            rollback;
         end if;
-
-
 
     end loop;
 end;

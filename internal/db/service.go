@@ -116,7 +116,7 @@ func (s Service) SyncBetweenSQLAndNoSQL() error {
 }
 
 func (s Service) syncAppointments(tx *bolt.Tx) error {
-	rows, err := s.db.App().Query("select nro_turno, fecha, nro_consultorio, dni_medique, nro_paciente, nro_obra_social_consulta, nro_afiliade_consulta, monto_paciente, monto_obra_social, f_reserva, estado from turno")
+	rows, err := s.db.App().Query("select nro_turno, fecha, nro_consultorio, dni_medique, COALESCE(nro_paciente, 0), COALESCE(nro_obra_social_consulta, 0), COALESCE(nro_afiliade_consulta, 0), COALESCE(monto_paciente, 0), COALESCE(monto_obra_social, 0), COALESCE(f_reserva, '1999-01-01'), estado from turno")
 	if err != nil {
 		log.Fatalln(err)
 		return err
@@ -124,7 +124,7 @@ func (s Service) syncAppointments(tx *bolt.Tx) error {
 	bucket, _ := tx.CreateBucketIfNotExists([]byte("appointments"))
 	for rows.Next() {
 		appointment := internal.Appointment{}
-		err = rows.Scan(&appointment.Number, &appointment.Date, &appointment.ConsultingRoomNumber, &appointment.MedicDni, &appointment.PatientNumber, &appointment.PatientAmount, &appointment.InsuranceAmount, &appointment.ReserveDate, &appointment.Status)
+		err = rows.Scan(&appointment.Number, &appointment.Date, &appointment.ConsultingRoomNumber, &appointment.MedicDni, &appointment.PatientNumber, &appointment.InsuranceNumber, &appointment.AffiliateNumber, &appointment.PatientAmount, &appointment.InsuranceAmount, &appointment.ReserveDate, &appointment.Status)
 		if err != nil {
 			log.Fatalln(err)
 			return err

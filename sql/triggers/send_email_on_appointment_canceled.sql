@@ -13,6 +13,10 @@ begin
         return new;
     end if;
 
+    if old.estado = 'disponible' then
+        return new;
+    end if;
+
     select
         t.nro_turno,
         concat(p.nombre, ' ', p.apellido) as nombre_paciente,
