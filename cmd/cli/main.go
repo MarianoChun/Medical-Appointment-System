@@ -24,21 +24,21 @@ const (
 	dbSecondOption  = "2. Crear Tablas"
 	dbThirdOption   = "3. Crear Primary/Foreign Keys"
 	dbQuarterOption = "4. Eliminar Primary/Foreign Keys"
-	dbFifthOption   = "5. Administración de Stored Procedures"
+	dbFifthOption   = "5. Crear de Stored Procedures"
 	dbSixthOption   = "6. Crear Triggers"
 	dbSeventhOption = "7. Insertar data"
+	dbEighthOption  = "8. Ejecutar Stored Procedures"
 
 	noSqlFirstOption  = "1. Sincronizar Bases de datos"
 	noSqlSecondOption = "2. Ver datos"
 
-	spFirstOption   = "1. Crear Stored Procedures"
-	spSecondOption  = "2. Generar turnos disponibles"
-	spThirtyOption  = "3. Atender turnos"
-	spQuarterOption = "4. Cancelar turnos"
-	spFifthOption   = "5. Reservar turnos"
-	spSixthOption   = "6. Generar liquidación para obras sociales"
-	spSeventhOption = "7. Enviar emails de inasistencia"
-	spEighthOption  = "8. Enviar emails de recordatorio"
+	spFirstOption   = "1. Generar turnos disponibles"
+	spSecondOption  = "2. Atender turnos"
+	spThirtyOption  = "3. Cancelar turnos"
+	spQuarterOption = "4. Reservar turnos"
+	spFifthOption   = "5. Generar liquidación para obras sociales"
+	spSixthOption   = "6. Enviar emails de inasistencia"
+	spSevenOption   = "7. Enviar emails de recordatorio"
 )
 
 func main() {
@@ -84,7 +84,7 @@ func showSQL(app app.App) error {
 	executing := true
 
 	for executing {
-		kit.PrintOptions(dbMessage, dbFirstOption, dbSecondOption, dbThirdOption, dbQuarterOption, dbFifthOption, dbSixthOption, dbSeventhOption)
+		kit.PrintOptions(dbMessage, dbFirstOption, dbSecondOption, dbThirdOption, dbQuarterOption, dbFifthOption, dbSixthOption, dbSeventhOption, dbEighthOption)
 		option, err := kit.ScanOptionSelected()
 		if err != nil {
 			log.Fatalln(err)
@@ -97,23 +97,19 @@ func showSQL(app app.App) error {
 		case "2":
 			executing = app.DatabaseService.CreateTables() == nil
 		case "3":
-			if app.PrimaryKeysService.Create() == nil && app.ForeignKeysService.Create() == nil {
-				executing = false
-			}
+			executing = app.PrimaryKeysService.Create() == nil
+			executing = app.ForeignKeysService.Create() == nil
 		case "4":
-			if app.ForeignKeysService.Delete() == nil && app.PrimaryKeysService.Delete() == nil {
-				executing = false
-			}
+			executing = app.PrimaryKeysService.Delete() == nil
+			executing = app.ForeignKeysService.Delete() == nil
 		case "5":
-			if showStoredProcedures(app) == nil {
-				executing = false
-			}
+			executing = app.StoredProcedureService.Create() == nil
 		case "6":
-			if app.TriggerService.Create() == nil {
-				executing = false
-			}
+			executing = app.TriggerService.Create() == nil
 		case "7":
 			executing = app.DatabaseService.InsertData() == nil
+		case "8":
+			executing = showStoredProcedures(app) == nil
 		default:
 			executing = false
 		}
@@ -126,7 +122,7 @@ func showStoredProcedures(app app.App) error {
 	executing := true
 
 	for executing {
-		kit.PrintOptions(spMessage, spFirstOption, spSecondOption, spThirtyOption, spQuarterOption, spFifthOption, spSixthOption, spSeventhOption, spEighthOption)
+		kit.PrintOptions(spMessage, spFirstOption, spSecondOption, spThirtyOption, spQuarterOption, spFifthOption, spSixthOption, spSevenOption)
 		option, err := kit.ScanOptionSelected()
 		if err != nil {
 			log.Fatalln(err)
@@ -135,20 +131,18 @@ func showStoredProcedures(app app.App) error {
 
 		switch option {
 		case "1":
-			executing = app.StoredProcedureService.Create() == nil
-		case "2":
 			executing = executeAppointmentGenerator(app) == nil
-		case "3":
+		case "2":
 			executing = executeAppointmentAttender(app) == nil
-		case "4":
+		case "3":
 			executing = executeAppointmentCanceller(app) == nil
-		case "5":
+		case "4":
 			executing = executeAppointmentReserver(app) == nil
-		case "6":
+		case "5":
 			executing = app.InsuranceService.GenerateSettlements() == nil
-		case "7":
+		case "6":
 			executing = app.EmailService.SendAbsenseEmails() == nil
-		case "8":
+		case "7":
 			executing = app.EmailService.SendReminderEmails() == nil
 		default:
 			executing = false
@@ -185,8 +179,8 @@ func executeAppointmentAttender(app app.App) error {
 }
 
 func executeAppointmentReserver(app app.App) error {
-	current_month := time.Now().Format("1")
-	current_year := time.Now().Format("2006")
+	currentMonth := time.Now().Format("1")
+	currentYear := time.Now().Format("2006")
 
 	_, err := app.GetDb().App().Exec("delete from turno;")
 	if err != nil {
@@ -194,7 +188,7 @@ func executeAppointmentReserver(app app.App) error {
 		return err
 	}
 
-	query := fmt.Sprintf("select generate_appointments_in_month(%s, %s);", current_year, current_month)
+	query := fmt.Sprintf("select generate_appointments_in_month(%s, %s);", currentYear, currentMonth)
 	_, err = app.GetDb().App().Exec(query)
 	if err != nil {
 		log.Fatalln(err)
