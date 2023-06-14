@@ -116,6 +116,8 @@ func (s Service) SyncBetweenSQLAndNoSQL() error {
 }
 
 func (s Service) syncAppointments(tx *bolt.Tx) error {
+	var appointmentsPerMedic = make(map[int]int)
+
 	rows, err := s.db.App().Query("select nro_turno, fecha, nro_consultorio, dni_medique, COALESCE(nro_paciente, 0), COALESCE(nro_obra_social_consulta, 0), COALESCE(nro_afiliade_consulta, 0), COALESCE(monto_paciente, 0), COALESCE(monto_obra_social, 0), COALESCE(f_reserva, '1999-01-01'), estado from turno")
 	if err != nil {
 		log.Fatalln(err)
@@ -129,14 +131,19 @@ func (s Service) syncAppointments(tx *bolt.Tx) error {
 			log.Fatalln(err)
 			return err
 		}
-		data, err := json.Marshal(appointment)
-		if err != nil {
-			log.Fatalln(err)
-			return err
-		}
-		err = bucket.Put([]byte(string(rune(appointment.Number))), data)
-		if err != nil {
-			return err
+		if appointmentsPerMedic[appointment.MedicDni] != 3 {
+			data, err := json.Marshal(appointment)
+			if err != nil {
+				log.Fatalln(err)
+				return err
+			}
+
+			err = bucket.Put([]byte(string(rune(appointment.Number))), data)
+			if err != nil {
+				return err
+			}
+
+			appointmentsPerMedic[appointment.MedicDni]++
 		}
 	}
 	return nil
