@@ -16,39 +16,53 @@ func NewService(db kit.Database) Service {
 }
 
 func (s Service) SendAbsenseEmails() error {
-	query := "select send_absence_emails();"
+	begin, err := s.db.App().Begin()
+	if err != nil {
+		return err
+	}
 
 	// Con serializable nos aseguramos porque las transacciones se ejecutan secuencialmente y no enviaremos mail duplicados
-	_, err := s.db.App().Exec("set transaction isolation level serializable;")
+	_, err = begin.Exec("set transaction isolation level serializable;")
 	if err != nil {
 		log.Fatal(err)
+		begin.Rollback()
 		return err
 	}
 
-	err = kit.ExecuteQuery(query, s.db.App())
+	_, err = begin.Exec("select send_absence_emails();")
 	if err != nil {
 		log.Fatal(err)
+		begin.Rollback()
 		return err
 	}
+
+	begin.Commit()
 
 	return nil
 }
 
 func (s Service) SendReminderEmails() error {
-	query := "select send_reminder_on_appointment_reserved();"
+	begin, err := s.db.App().Begin()
+	if err != nil {
+		return err
+	}
 
 	// Con serializable nos aseguramos porque las transacciones se ejecutan secuencialmente y no enviaremos mail duplicados
-	_, err := s.db.App().Exec("set transaction isolation level serializable;")
+	_, err = begin.Exec("set transaction isolation level serializable;")
 	if err != nil {
 		log.Fatal(err)
+		begin.Rollback()
 		return err
 	}
 
-	err = kit.ExecuteQuery(query, s.db.App())
+	_, err = begin.Exec("select send_reminder_on_appointment_reserved();")
 	if err != nil {
 		log.Fatal(err)
+		begin.Rollback()
 		return err
 	}
+
+	begin.Commit()
 
 	return nil
 }
