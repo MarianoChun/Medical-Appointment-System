@@ -236,46 +236,23 @@ Además de estas funciones, el SP utiliza variables locales, bucles, condiciones
 
 ===== Generar liquidaciones para las obras sociales
 * *Ubicación*: `sql/sp/generate_insurance_settlements.sql`
-* *Descripción del proceso*: El código del procedimiento almacenado "generate_insurance_settlements" se encarga de generar liquidaciones de las obras sociales. A continuación, se describe su funcionalidad paso a paso:
+* *Descripción del proceso*: El stored procedure (SP) "generate_insurance_settlements" realiza la generación de liquidaciones para las obras sociales en un determinado período de tiempo. A continuación se presenta una descripción funcional del código:
 
-1. Se declaran las siguientes variables:
-- `obraSocial`: Variable de tipo `record` utilizada para almacenar los datos de una obra social específica.
-- `turnoRecord`: Variable de tipo `record` utilizada para almacenar los datos de un turno específico.
-- `result`: Variable de tipo `record` utilizada para almacenar los datos de resultados de consultas relacionadas a pacientes y médicos.
-- `fechaMesLiquidacionHasta`: Variable de tipo `date` que almacena la fecha actual.
-- `fechaMesLiquidacionDesde`: Variable de tipo `date` que almacena la fecha del mes anterior a la fecha actual.
-- `fechaUltimaLiquidacion`: Variable de tipo `date` que almacenará la fecha de la última liquidación generada.
-- `montoObraSocial`: Variable de tipo `decimal` utilizada para calcular el monto total de la liquidación de una obra social.
-- `nroLiquidacionActual`: Variable de tipo `integer` utilizada para almacenar el número de liquidación actual.
+1. El SP comienza declarando variables locales para almacenar registros y valores relacionados con el proceso de liquidación, como la fecha de inicio y fin del mes actual, la fecha de la última liquidación, el monto total de la obra social y el número de liquidación actual.
 
-2. Se verifica si existen registros en la tabla "liquidacion_cabecera". Si hay registros, se obtiene la fecha de la última liquidación generada y se compara con la fecha actual. Si ambas fechas coinciden en año y mes, no se realiza ninguna acción y se finaliza el procedimiento.
+2. Luego, se realiza una serie de comprobaciones para determinar si se debe generar una liquidación. Primero, se verifica si existen registros en la tabla "liquidacion_cabecera". Si no hay registros, se verifica si hay turnos atendidos en el período de tiempo especificado. Si no hay turnos atendidos, se finaliza la ejecución del SP.
 
-3. Se inicia un bucle "for" que itera sobre las obras sociales existentes en la tabla "obra_social".
+3. A continuación, se itera sobre cada obra social obtenida de la tabla "obra_social". Para cada obra social, se verifica si hay turnos atendidos relacionados con ella en el período de tiempo especificado.
 
-4. Dentro del bucle, se inicializa el monto de la obra social en $0.
+4. Si hay turnos atendidos para la obra social actual, se inicializa el monto de la obra social en cero y se inserta un nuevo registro en la tabla "liquidacion_cabecera" con los datos correspondientes a la obra social y al período de liquidación.
 
-5. Se realiza una inserción en la tabla "liquidacion_cabecera" con los datos correspondientes a la nueva liquidación generada, incluyendo el número de obra social, el rango de fechas de la liquidación y el monto inicialmente establecido como $0.
+5. Luego, se itera sobre cada turno atendido relacionado con la obra social actual. Para cada turno, se obtienen los datos del paciente y el médico correspondiente y se insertan en la tabla "liquidacion_detalle". Además, se actualiza el estado del turno a "liquidado" y se acumula el monto de la obra social.
 
-6. Se obtiene el número de liquidación actual generado en el paso anterior.
+6. Después de finalizar el bucle de los turnos, se verifica si el monto de la obra social es mayor a cero. Si es así, se actualiza el total en el registro de la liquidación correspondiente. De lo contrario, si el monto es cero, se elimina el registro de liquidación.
 
-7. Se inicia otro bucle "for" que itera sobre los turnos que cumplen las siguientes condiciones:
-- El número de obra social del turno coincide con el número de obra social actual del bucle externo.
-- El estado del turno es "atendido".
-- La fecha del turno está dentro del rango de fechas de la liquidación.
+7. Finalmente, el SP concluye después de iterar sobre todas las obras sociales y realizar las operaciones de liquidación correspondientes.
 
-8. Dentro del segundo bucle, se realiza una consulta para obtener los datos del paciente y el médico relacionados con el turno actual. Los resultados se almacenan en la variable `result`.
-
-9. Se realiza una inserción en la tabla "liquidacion_detalle" con los datos correspondientes al turno actual y la liquidación actual. Se incluyen datos como la fecha de atención, número de afiliado, datos del paciente y médico, especialidad y monto correspondiente al seguro médico.
-
-10. Se actualiza el monto de la obra social incrementándolo con el monto del seguro médico del turno actual.
-
-11. Se actualiza el estado del turno a "liquidado".
-
-12. Una vez finalizado el bucle interno, se actualiza el campo "total" de la tabla "liquidacion_cabecera" con el monto total de la obra social correspondiente.
-
-13. Se repiten los pasos 4 a 12 para cada obra social existente en la base de datos.
-
-En resumen, este procedimiento almacenado genera liquidaciones para todas las obras sociales existentes. Recorre los turnos atendidos en un rango de fechas específico y calcula el monto total de la liquidación para cada obra social. Luego, actualiza las tablas "liquidacion_cabecera" y "liquidacion_detalle" con los datos correspondientes.
+En resumen, este SP genera liquidaciones para las obras sociales en función de los turnos atendidos en un período de tiempo específico. Recopila la información relevante de los pacientes y los médicos en cada turno y la almacena en las tablas "liquidacion_cabecera" y "liquidacion_detalle", respectivamente. Además, actualiza el estado de los turnos a "liquidado" y realiza cálculos de monto total para cada obra social.
 
 * *Isolation level utilizado*: Utiliza el nivel de aislamiento "serializable" para aseguramos que no se generen liquidaciones duplicadas ya que las transacciones se ejecutan secuencialmente, obtenemos un mayor control sobre la lectura de los datos y evitamos que se produzcan errores de concurrencia.
 
