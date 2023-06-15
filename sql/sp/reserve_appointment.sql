@@ -7,7 +7,6 @@ declare
     turnosReservadosPaciente integer;
     montoPaciente decimal(12,2);
     montoObraSocial decimal(12,2);
-    timeStampTurnoSolicitado timestamp := fechaHora;
 begin
     select * into result from medique where medique.dni_medique = dni_medique_reserva;
     if not found then
@@ -36,7 +35,7 @@ begin
     end if;
 
 
-    select * into turnoAReservar from turno where turno.fecha = timeStampTurnoSolicitado and turno.dni_medique = dni_medique_reserva and turno.estado = 'disponible' limit 1;
+    select * into turnoAReservar from turno where turno.fecha = fechaHora and turno.dni_medique = dni_medique_reserva and turno.estado = 'disponible' limit 1;
     if not found then
         insert into error (nro_error, f_turno, nro_consultorio, dni_medique, nro_paciente, operacion, f_error, motivo) values (default, null, null, dni_medique_reserva, nro_historia_clinica, 'reserva', now(), '?turno inexistente ó no disponible');
         raise notice 'El turno es inexistente ó no esta disponible';
