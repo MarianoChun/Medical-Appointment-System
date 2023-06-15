@@ -208,7 +208,7 @@ func (s Service) syncMedics(tx *bolt.Tx) error {
 }
 
 func (s Service) syncPatients(tx *bolt.Tx) error {
-	rows, err := s.db.App().Query("select nro_paciente, nombre, apellido, dni_paciente, f_nac, nro_obra_social, nro_afiliade, domicilio, telefono, email from paciente")
+	rows, err := s.db.App().Query("select nro_paciente, nombre, apellido, dni_paciente, f_nac, COALESCE(nro_obra_social, -1), nro_afiliade, domicilio, telefono, email from paciente")
 	if err != nil {
 		log.Fatalln(err)
 		return err
