@@ -259,9 +259,32 @@ Estas funciones son funciones integradas en PostgreSQL y se utilizan para realiz
 
 ===== Reservar turno
 * *Ubicación*: `sql/sp/reserve_appointment.sql`
-* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Descripción del proceso*:
+Este archivo es el encargado de definir la funcion `reserve_appointment(nro_historia_clinica integer, dni_medique_reserva integer, fechaHora timestamp)` que dado una historia clinica, dni de un medico y una fecha hora intenta reservar un turno.
+El valor de retorno es un booleano, retornando `true` en caso de que la reserva sea exitosa y `false` de caso contrario
+
+Los pasos de la función son:
+
+1. Definir las variables:
+	- result record; Utilizado como una variable temporal para verificar que se encuentre la información necesaria para la reserva del turno
+    - turnoAReservar record; Utilizado para almacenar el turno a reservar
+    - nroObraSocialPaciente integer; Se usa para guardar el numero de obra social relacionada al paciente con la historia clinica del primer parametro de la función, sera utilizado para determinar si la cobertura del medico cubre al paciente
+    - nroAfiliadePaciente integer := null; Se usa para almacenar el numero de afiliado del paciente con turno a generar en caso de que la cobertura del medico cubra al paciente
+    - turnosReservadosPaciente integer; Variable usada para contar los turnos del paciente para la verificación de turnos maximos, un paciente solo puede tener 5 turnos reservados al mismo tiempo
+    - montoPaciente decimal(12,2); Almacena el monto a pagar del paciente, en caso de este mismo no tener obra social se guarda el monto a pagar por una consulta privada del medico, en caso de que si tenga una obra social se guarda el monto a pagar por el paciente indicado en la cobertura 
+    - montoObraSocial decimal(12,2); Se guarda el monto a pagar por la obra social por un turno, indicado en la cobertura
+
+2. se intenta encontrar al medico con el dni_medique pasado por parametro. En caso de no ser encontrado se inserta un error con la información del turno y el mensaje `?dni de médique no válido` y se retorna false
+3. se intenta encontrar al paciente con el nro de historia clinica pasado por parametro. En caso de no ser encontrado se inserta un error con la información del turno y el mensaje  `?nro de historia clínica no válido` y se retorna false
+4. Se busca el numero de obra social del paciente pasado por parametro y se almacena en nroObraSocialPaciente, En caso de tener se verifica que la cobertura del medico tenga incluida esta obra social. De no estar en la cobertura del medico se  inserta un error con la información del turno y el mensaje  `?obra social de paciente no atendida por le médique` y se retorna false
+5. Se busca el turno a reservar con la fecha/hora pasada por parametro y con el estado 'disponible' en caso de no ser encontrado se  inserta un error con la información del turno y el mensaje  `?turno inexistente ó no disponible` y se retorna false 
+6. Se verifica que el paciente no tenga mas de 5 turnos reservados al mismo tiempo, de tener más se inserta un error con la información del turno y el mensaje `?supera límite de reserva de turnos` y se retorna false
+7. Se consiguen los montos a pagar dependiendo de la obra social del paciente
+8. Se actualiza el turno con la información del paciente, obra social, montos a abonar y el estado 'reservado'
+9. Se retorna true 
+* *Isolation level utilizado*: Se eligió que el isolation level sea serializable, ya que debemos evitar que otra transacción modifique el turno que intentamos actualizar en la función
+* *Aclaraciones y funciones utilizadas*:
+En particular se hace uso de la variable `found` que almacena si la ultima query encontró algun registro para la mayoria de los chequeos de existencia
 
 ===== Enviar emails de turno olvidados
 * *Ubicación*: `sql/sp/send_reminder_email.sql`
