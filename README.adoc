@@ -287,10 +287,25 @@ Los pasos de la función son:
 En particular se hace uso de la variable `found` que almacena si la ultima query encontró algun registro para la mayoria de los chequeos de existencia
 
 ===== Enviar emails de turno olvidados
-* *Ubicación*: `sql/sp/send_reminder_email.sql`
-* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Ubicación*: `sql/sp/send_absence_emails.sql`
+* *Descripción del proceso*: 
+	En este archivo see define la funcion `send_absence_emails` que lo que hace es recorrer todos los turnos para el dia de ayer y en el caso de que hayan estado reservados crea un email que le recuerda al paciente que ah perdido su turno.
+
+	Los pasos son:
+
+	1. Definir las variables:
+		- result record; que almacena la informacion del turno,medico y paciente de cada ciclo del for 
+        - has_been_email_sent int := 0; Guarda si es que este email ya fue creado, 1 si ya fue creado y 0 si no
+        - email_body varchar; Guarad el cuerpo del email con la infor acion del turno, medico y paciente
+        - email_status varchar := 'enviado'; Es el estado del email que va a ser creado
+        - email_title varchar := 'Turno cancelado'; Es el titulo del email que va a ser creado
+
+	2. Se inicia un ciclo for que recorre todos los turnos para el dia de ayer y guarda información necesaria para el email
+	3. Se crea el body para el email con la informacion sobre el turno cancelado
+	4. Se verifica si es que el mismo email no fue enviado usando el body
+	5. si es que el email no fue insertado con anterioridad se inserta un nuevo email con el body definido en el paso 3 y con el estado y titulo definido en las variables
+* *Isolation level utilizado*: El isolation level para este SP se estableció como serializable ya que queremos estar seguros que el email no fue creado con anterioridad para evitar repetición
+* *Aclaraciones y funciones utilizadas*: La variable result no guarda un registro de una tabla particular sino que es un conjunto de registros de diferentes tablas que son turno, medique y paciente. Esto no genera conflictos ya que se usan aliases con la forma `nombre_columna as nombre_alias`
 
 ===== Enviar emails de recordatorios de turnos
 * *Ubicación*: `sql/sp/send_reminder_email_on_appointment_reserved.sql`
