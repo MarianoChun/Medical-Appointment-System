@@ -363,7 +363,7 @@ La sincronización tiene como punto inicial a la función `SyncBetweenSQLAndNoSQ
 
 A continuación, se llama a diferentes funciones de sincronización, como `syncPatients`, `syncMedics`, `syncConsultingRooms`, `syncInsurances` y `syncAppointments`. Cada una de estas funciones se encarga de recuperar los datos solicitados en la consigna de la base de datos SQL y almacenarlos en la base de datos BoltDB.
 
-El procedimiento para cada una de las funciones es bastante similar, por mencionar una de ellas, en la función syncAppointments, se ejecuta una consulta SQL para recuperar los datos de los turnos de la base de datos SQL. Luego, se itera sobre los resultados de la consulta y se construye un objeto Appointment con los datos obtenidos. A continuación, se codifica el objeto por medio de un Marshal en formato JSON y se almacena en un bucket llamado "appointments" en la base de datos BoltDB.
+El procedimiento para cada una de las funciones es bastante similar, por mencionar una de ellas, en la función `syncAppointments`, se ejecuta una consulta SQL para recuperar los datos de los turnos de la base de datos SQL. Luego, se itera sobre los resultados de la consulta y se construye un objeto Appointment con los datos obtenidos. A continuación, se codifica el objeto por medio de un Marshal en formato JSON y se almacena en un bucket llamado "appointments" en la base de datos BoltDB.
 
 Este proceso se repite para las otras funciones de sincronización, donde se recuperan datos de diferentes tablas de la base de datos SQL y se almacenan en los buckets correspondientes.
 
