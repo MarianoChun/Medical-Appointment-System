@@ -25,4 +25,4 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace trigger send_email_on_appointment_reservated after update of estado on turno for each row execute procedure send_email_on_appointment_reservation();
+create or replace trigger send_email_on_appointment_reserved after update of estado on turno for each row execute procedure send_email_on_appointment_reservation();
