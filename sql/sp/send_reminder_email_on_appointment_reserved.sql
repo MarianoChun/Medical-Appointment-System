@@ -2,13 +2,24 @@ create or replace function send_reminder_on_appointment_reserved() returns void 
 declare
     turno turno%rowtype;
     result record;
-    appointment_date_to_remind date := (current_date + interval '2 days')::date;
+    appointment_date_to_remind date;
+    reminderInterval interval;
     email_title text := 'Recordatorio de turno';
     email_body text;
     has_been_email_sent int := 0;
 begin
+    case
+        when date_part('dow', current_date) = 4 then
+            reminderInterval := ('4 days')::interval;
+        when date_part('dow', current_date) = 5 then
+            reminderInterval :=('3 days')::interval;
+        else
+            reminderInterval := ('2 days')::interval;
+    end case;
 
-    for turno in select * from turno where estado = 'reservado' and (fecha + interval '2 days')::date = appointment_date_to_remind and date(fecha) != current_date loop
+    appointment_date_to_remind := (current_date + reminderInterval)::date;
+
+    for turno in select * from turno where estado = 'reservado' and date(fecha) = appointment_date_to_remind and date(fecha) != current_date loop
         select
             p.email,
             concat(p.nombre,' ',p.apellido) as patient_full_name,
