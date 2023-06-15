@@ -349,8 +349,24 @@ En particular se hace uso de la variable `found` que almacena si la ultima query
 ==== Triggers
 ===== Enviar email de confirmación cuando el turno fue reservado
 * *Ubicación*: `sql/triggers/send_confirmation_email_on_appointment_reserved.sql`
-* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Descripción del proceso*: El trigger `send_email_on_appointment_reserved` se lanza una vez que actualizamos la columna de estado en la tabla turno, por cada actualización de fila. El fin es crear un email que informa de la reserva del turno con la información de este y el medico encargado del turno y el paciente a atender.
+
+El trigger hace uso de la función `send_email_on_appointment_reservation` cuando se activa, y su procedimiento es el siguiente:
+
+1. Se declaran las variables:
+    - patient record; se utilizará para almacenar el paciente a atender en el turno actualizado
+    - medic record; se utilizará para almacenar el medico encargado de atender el turno modificado
+    - title text := 'Reserva de turno'; El titulo para el email a generar
+    - body text; Se utilizará para guardar el mensaje del email a generar
+    - estado text := 'pendiente'; Es el estado con el que se creará el email
+
+2. Revisamos si es que se actualizó el estadod el turno, en caso de no haber cambios se termina la función
+3. Se revisa si el nuevo estado del turno es diferente de 'reservado' ya que solo queremos crear un email solo si el nuevo estado es reservado. En caso de ser diferente se termina la función
+4. Se buscar el paciente y el medico utilizando las columnas dni_medique y nro_paciente que se encuentran en el turno.
+5. Se  formatea el mensaje del email utilizando la información obtenida en el paso 4
+6.  Se inserta el email notificando que el turno fue reservado con la información obtenida en los pasos anteriores
+* *Aclaraciones y funciones utilizadas*: 
+Este trigger solo se va a activar si y solo si se actualiza el campo estado de turno, en caso de moficiar algun otro campo no se va a lanzar
 
 ===== Enviar email cuando el turno fue cancelado
 * *Ubicación*: `sql/triggers/send_email_on_appointment_canceled.sql`
