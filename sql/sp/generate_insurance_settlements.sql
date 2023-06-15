@@ -14,6 +14,10 @@ begin
         if extract('year' from fechaUltimaLiquidacion) = extract('year' from current_date) and extract('month' from fechaUltimaLiquidacion) = extract('month' from current_date) then
             return;
         end if;
+    else
+        if (select count(1) from turno where estado = 'atendido') = 0 then
+           return;
+    end if;
     end if;
 
     for obraSocial in select * from obra_social loop
