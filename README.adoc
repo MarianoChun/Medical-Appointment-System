@@ -193,55 +193,68 @@ hasta que haya finalizado la ejecución de la primera transacción. Por otro lad
 * *Aclaraciones y funciones utilizadas*: Este SP esta relacionado al trigger de "send_email_on_appointment_canceled" dado que cada vez que se hace un update sobre la tabla de turnos, el mismo se ejecuta  para buscar los turnos cancelados, y manda el aviso de cancelación del turno a cada paciente que haya tenido un turno reservado con el doctor afectado.
 
 ===== Generar turnos a partir de un año y mes
-* *Ubicación*: `sql/sp/generate_available_appointment.sql`
-* *Descripción del proceso*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Isolation level utilizado*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
-* *Aclaraciones y funciones utilizadas*: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tristique ornare euismod. Fusce placerat, enim eu placerat maximus, felis enim interdum nisl, a tempus felis sapien in nisi. In accumsan risus justo, sed egestas ligula hendrerit non. Aliquam ullamcorper iaculis feugiat.
+* *Ubicación*: `sql/sp/generate_appointments.sql`
+* *Descripción del proceso*: El código del stored procedure (SP) "generate_appointments_in_month" tiene la finalidad de generar turnos o citas médicas para un mes específico, utilizando la información de la agenda de los médicos. A continuación, se proporciona una descripción funcional del código:
+
+1. El SP recibe como parámetros el año y el mes para los cuales se generarán los turnos.
+
+2. Se definen variables locales para almacenar la fecha de inicio del mes, la fecha de fin del mes, el día actual y otros valores temporales.
+
+3. Se inicia un bucle que recorre cada día dentro del rango del mes especificado.
+
+4. Dentro del bucle de días, se ejecuta otro bucle que recorre cada registro de la tabla "agenda" que coincide con el día de la semana correspondiente al día actual.
+
+5. Dentro de este segundo bucle, se genera una serie de fechas y horas en base a los valores de la agenda, utilizando la función "generate_series". Esto permite generar los intervalos de tiempo disponibles para los turnos.
+
+6. Para cada fecha y hora generada, se verifica si ya existe un turno programado en el mismo rango de tiempo y para el mismo médico. Si existe, se genera un aviso y se realiza un ROLLBACK, deshaciendo todas las operaciones realizadas hasta el momento.
+
+7. Si no existe un turno en el mismo rango de tiempo y médico, se inserta un nuevo registro en la tabla "turno" con la fecha, el consultorio, el médico y el estado inicializado como "disponible".
+
+8. Después de completar los bucles de días y agenda, se realizan consultas para contar la cantidad de médicos distintos en la agenda y la cantidad de médicos distintos en los turnos generados en el rango de fechas del mes.
+
+9. Se comparan los recuentos obtenidos para verificar si coinciden. Si no coinciden, se genera un aviso y se realiza un ROLLBACK, deshaciendo todas las operaciones realizadas hasta el momento.
+
+10. Si los recuentos coinciden, se genera un aviso y se realiza un COMMIT, confirmando los cambios realizados en la base de datos.
+
+11. Si ocurre cualquier excepción durante la ejecución del SP, se captura el error, se genera un aviso y se devuelve un valor booleano indicando el fallo del proceso.
+
+En resumen, el SP "generate_appointments_in_month" utiliza la información de la agenda médica para generar turnos o citas médicas en un mes específico. Se verifican conflictos de programación y se realiza un seguimiento de la consistencia entre la agenda y los turnos generados. En caso de cualquier incongruencia o error, se deshacen los cambios realizados hasta ese punto.
+* *Isolation level utilizado*:  Utiliza el nivel de aislamiento "serializable" para aseguramos que no se generen turnos duplicados ya que las transacciones se ejecutan secuencialmente, obtenemos un mayor control sobre la lectura de los datos y evitamos que se produzcan errores de concurrencia.
+* *Aclaraciones y funciones utilizadas*: El stored procedure (SP) "generate_appointments_in_month" utiliza varias funciones de PostgreSQL en su implementación. A continuación se mencionan las funciones utilizadas en el código:
+
+1. **make_timestamp**: Se utiliza para crear un objeto de tipo timestamp a partir de los parámetros de año, mes y día.
+
+2. **generate_series**: Esta función se utiliza para generar una serie de fechas y horas dentro de un rango determinado. En el código, se utiliza para generar los intervalos de tiempo disponibles para los turnos, basándose en la agenda de los médicos.
+
+3. **date_part**: Se utiliza para extraer una parte específica de una fecha o un timestamp. En el código, se utiliza para obtener el día de la semana (dow) de una fecha.
+
+4. **count**: Se utiliza para contar el número de filas que cumplen con una determinada condición en una tabla. En el código, se utiliza para contar el número de turnos existentes en un rango de tiempo y para contar la cantidad de médicos distintos en la agenda y en los turnos generados.
+
+5. **concat**: Se utiliza para concatenar cadenas de texto. En el código, se utiliza para construir el cuerpo del correo electrónico que se enviará en caso de cancelación de un turno.
+
+Además de estas funciones, el SP utiliza variables locales, bucles, condiciones lógicas y excepciones para controlar el flujo y manejar posibles errores durante su ejecución.
 
 ===== Generar liquidaciones para las obras sociales
 * *Ubicación*: `sql/sp/generate_insurance_settlements.sql`
-* *Descripción del proceso*: El código del procedimiento almacenado "generate_insurance_settlements" se encarga de generar liquidaciones de las obras sociales. A continuación, se describe su funcionalidad paso a paso:
+* *Descripción del proceso*: El stored procedure (SP) "generate_insurance_settlements" realiza la generación de liquidaciones para las obras sociales en un determinado período de tiempo. A continuación se presenta una descripción funcional del código:
 
-1. Se declaran las siguientes variables:
-- `obraSocial`: Variable de tipo `record` utilizada para almacenar los datos de una obra social específica.
-- `turnoRecord`: Variable de tipo `record` utilizada para almacenar los datos de un turno específico.
-- `result`: Variable de tipo `record` utilizada para almacenar los datos de resultados de consultas relacionadas a pacientes y médicos.
-- `fechaMesLiquidacionHasta`: Variable de tipo `date` que almacena la fecha actual.
-- `fechaMesLiquidacionDesde`: Variable de tipo `date` que almacena la fecha del mes anterior a la fecha actual.
-- `fechaUltimaLiquidacion`: Variable de tipo `date` que almacenará la fecha de la última liquidación generada.
-- `montoObraSocial`: Variable de tipo `decimal` utilizada para calcular el monto total de la liquidación de una obra social.
-- `nroLiquidacionActual`: Variable de tipo `integer` utilizada para almacenar el número de liquidación actual.
+1. El SP comienza declarando variables locales para almacenar registros y valores relacionados con el proceso de liquidación, como la fecha de inicio y fin del mes actual, la fecha de la última liquidación, el monto total de la obra social y el número de liquidación actual.
 
-2. Se verifica si existen registros en la tabla "liquidacion_cabecera". Si hay registros, se obtiene la fecha de la última liquidación generada y se compara con la fecha actual. Si ambas fechas coinciden en año y mes, no se realiza ninguna acción y se finaliza el procedimiento.
+2. Luego, se realiza una serie de comprobaciones para determinar si se debe generar una liquidación. Primero, se verifica si existen registros en la tabla "liquidacion_cabecera". Si no hay registros, se verifica si hay turnos atendidos en el período de tiempo especificado. Si no hay turnos atendidos, se finaliza la ejecución del SP.
 
-3. Se inicia un bucle "for" que itera sobre las obras sociales existentes en la tabla "obra_social".
+3. A continuación, se itera sobre cada obra social obtenida de la tabla "obra_social". Para cada obra social, se verifica si hay turnos atendidos relacionados con ella en el período de tiempo especificado.
 
-4. Dentro del bucle, se inicializa el monto de la obra social en $0.
+4. Si hay turnos atendidos para la obra social actual, se inicializa el monto de la obra social en cero y se inserta un nuevo registro en la tabla "liquidacion_cabecera" con los datos correspondientes a la obra social y al período de liquidación.
 
-5. Se realiza una inserción en la tabla "liquidacion_cabecera" con los datos correspondientes a la nueva liquidación generada, incluyendo el número de obra social, el rango de fechas de la liquidación y el monto inicialmente establecido como $0.
+5. Luego, se itera sobre cada turno atendido relacionado con la obra social actual. Para cada turno, se obtienen los datos del paciente y el médico correspondiente y se insertan en la tabla "liquidacion_detalle". Además, se actualiza el estado del turno a "liquidado" y se acumula el monto de la obra social.
 
-6. Se obtiene el número de liquidación actual generado en el paso anterior.
+6. Después de finalizar el bucle de los turnos, se verifica si el monto de la obra social es mayor a cero. Si es así, se actualiza el total en el registro de la liquidación correspondiente. De lo contrario, si el monto es cero, se elimina el registro de liquidación.
 
-7. Se inicia otro bucle "for" que itera sobre los turnos que cumplen las siguientes condiciones:
-- El número de obra social del turno coincide con el número de obra social actual del bucle externo.
-- El estado del turno es "atendido".
-- La fecha del turno está dentro del rango de fechas de la liquidación.
+7. Finalmente, el SP concluye después de iterar sobre todas las obras sociales y realizar las operaciones de liquidación correspondientes.
 
-8. Dentro del segundo bucle, se realiza una consulta para obtener los datos del paciente y el médico relacionados con el turno actual. Los resultados se almacenan en la variable `result`.
+En resumen, este SP genera liquidaciones para las obras sociales en función de los turnos atendidos en un período de tiempo específico. Recopila la información relevante de los pacientes y los médicos en cada turno y la almacena en las tablas "liquidacion_cabecera" y "liquidacion_detalle", respectivamente. Además, actualiza el estado de los turnos a "liquidado" y realiza cálculos de monto total para cada obra social.
 
-9. Se realiza una inserción en la tabla "liquidacion_detalle" con los datos correspondientes al turno actual y la liquidación actual. Se incluyen datos como la fecha de atención, número de afiliado, datos del paciente y médico, especialidad y monto correspondiente al seguro médico.
-
-10. Se actualiza el monto de la obra social incrementándolo con el monto del seguro médico del turno actual.
-
-11. Se actualiza el estado del turno a "liquidado".
-
-12. Una vez finalizado el bucle interno, se actualiza el campo "total" de la tabla "liquidacion_cabecera" con el monto total de la obra social correspondiente.
-
-13. Se repiten los pasos 4 a 12 para cada obra social existente en la base de datos.
-
-En resumen, este procedimiento almacenado genera liquidaciones para todas las obras sociales existentes. Recorre los turnos atendidos en un rango de fechas específico y calcula el monto total de la liquidación para cada obra social. Luego, actualiza las tablas "liquidacion_cabecera" y "liquidacion_detalle" con los datos correspondientes.
-
-* *Isolation level utilizado*: Utiliza el nivel de aislamiento "serializable" para aseguramos que no se generen liquidaciones duplicadas ya que las transaccioens se ejecutan secuencialmente, obtenemos un mayor control sobre la lectura de los datos y evitamos que se produzcan errores de concurrencia.
+* *Isolation level utilizado*: Utiliza el nivel de aislamiento "serializable" para aseguramos que no se generen liquidaciones duplicadas ya que las transacciones se ejecutan secuencialmente, obtenemos un mayor control sobre la lectura de los datos y evitamos que se produzcan errores de concurrencia.
 
 * *Aclaraciones y funciones utilizadas*: El código del procedimiento almacenado "generate_insurance_settlements" utiliza las siguientes funciones específicas de PostgreSQL:
 
