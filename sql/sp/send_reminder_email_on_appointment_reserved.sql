@@ -7,7 +7,8 @@ declare
     email_body text;
     has_been_email_sent int := 0;
 begin
-    for turno in select * from turno where estado = 'reservado' and (fecha + interval '2 days')::date = appointment_date_to_remind loop
+
+    for turno in select * from turno where estado = 'reservado' and (fecha + interval '2 days')::date = appointment_date_to_remind and date(fecha) != current_date loop
         select
             p.email,
             concat(p.nombre,' ',p.apellido) as patient_full_name,
