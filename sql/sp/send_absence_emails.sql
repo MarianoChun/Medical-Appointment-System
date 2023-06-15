@@ -4,10 +4,10 @@ declare
     has_been_email_sent int := 0;
     email_body varchar;
     email_status varchar := 'enviado';
-    email_title varchar := 'Turno cancelado';
+    email_title varchar := 'Turno inasistido';
 begin
     for result in select t.nro_turno, concat(p.nombre, ' ', p.apellido) as nombre_paciente, p.email as email_paciente, concat(m.nombre, ' ', m.apellido) as nombre_medique, t.fecha as fecha_turno from turno t, paciente p, medique m where t.nro_paciente = p.nro_paciente and m.dni_medique = t.dni_medique and t.estado = 'reservado' and date(t.fecha) = date(now() - CAST('1 days' AS INTERVAL)) loop
-        email_body := concat('¡Hola, ', result.nombre_paciente,'! Su turno con el medico ', result.nombre_medique, ' del día ', result.fecha_turno , ' ha sido cancelado. Pronto el centro de atención se contactará con usted.');
+        email_body := concat('¡Hola, ', result.nombre_paciente,'! Su turno con el medico ', result.nombre_medique, ' del día ', result.fecha_turno , ' ha sido cancelado por inasistencia. Pronto el centro de atención se contactará con usted.');
 
         select count(1)
         from envio_email e
